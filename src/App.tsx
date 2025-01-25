@@ -117,7 +117,7 @@ function App() {
 
       <div className="container mx-auto p-4 flex gap-4">
         {/* Editor Section */}
-        <div className="w-1/2 bg-[#2a2a2a] p-6 rounded-lg max-h-[calc(100vh-95px)]">
+        <div className="w-1/2 bg-[#2a2a2a] p-6 rounded-lg">
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium mb-2">
