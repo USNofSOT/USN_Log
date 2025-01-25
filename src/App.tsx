@@ -106,6 +106,16 @@ function App() {
     }, "image/png");
   };
 
+  const resetState = () => {
+    setTitle("");
+    setBody("");
+    setSignature("");
+    setEvents("");
+    setCrew("");
+    setGold("");
+    setDoubloons("");
+  };
+
   return (
     <div className="min-h-screen bg-[#1a1a1a] text-white">
       {/* Header */}
@@ -224,6 +234,13 @@ function App() {
               >
                 <Printer size={20} />
                 Generate Image
+              </button>
+
+              <button
+                onClick={resetState}
+                className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded flex items-center justify-center gap-2"
+              >
+                Reset
               </button>
             </div>
           </div>
