@@ -135,11 +135,11 @@ function App() {
   };
 
   const formatDiscordMessage = () => {
-    return `Title\n${title || "title here"}\n\nDetails\n${
-      body || "details here"
-    }\n\nEvents:\n${events || "events here"}\n\nGold: ${
-      gold || "0"
-    }\nDoubloons: ${doubloons || "0"}\n\nCrew:\n${crew || "crew names"}`;
+    return `${title || "title here"}\n\n${body || "details here"}\n\nEvents:\n${
+      events || "events here"
+    }\n\n:Gold: Gold: ${gold || "0"}\n:Doubloons: Doubloons: ${
+      doubloons || "0"
+    }\n\nCrew:\n${crew || "crew names"}`;
   };
 
   const copyToClipboard = () => {
