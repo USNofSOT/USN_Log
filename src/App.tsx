@@ -80,12 +80,13 @@ function App() {
   }, [title, body, signature, events, crew, gold, doubloons, subtitle]);
 
   // -----------------------------------
-  // 2) Pagination logic (naive approach)
+  // 2) Pagination logic based on writing area height
   // -----------------------------------
-  const MAX_LINES_PER_PAGE = 30;
-  const MAX_CHARS_PER_PAGE = 1400;
-  const EXTRA_LINES_NON_LAST = 14;
-  const EXTRA_CHARS_NON_LAST = 500;
+  const WRITING_AREA_HEIGHT = 982; // pixels
+  const LINE_HEIGHT = 24; // approximate line height in pixels
+  const LINES_PER_PAGE = Math.floor(WRITING_AREA_HEIGHT / LINE_HEIGHT);
+  const CHARS_PER_LINE = 70; // approximate chars that fit per line
+  const CHARS_PER_PAGE = LINES_PER_PAGE * CHARS_PER_LINE;
 
   function splitTextIntoPages(longText: string): string[] {
     if (!longText) return [""];
@@ -93,54 +94,45 @@ function App() {
     const pagesArr: string[] = [];
     const lines = longText.split("\n");
     let currentPage = "";
-    let lineCount = 0;
-    let charCount = 0;
+    let currentHeight = 0;
 
     for (const line of lines) {
-      // Calculate max lines/chars for current page
-      const isLastPage =
-        currentPage === "" && lines.indexOf(line) === lines.length - 1;
-      const maxLines = isLastPage
-        ? MAX_LINES_PER_PAGE
-        : MAX_LINES_PER_PAGE + EXTRA_LINES_NON_LAST;
-      const maxChars = isLastPage
-        ? MAX_CHARS_PER_PAGE
-        : MAX_CHARS_PER_PAGE + EXTRA_CHARS_NON_LAST;
+      // Calculate approximate height this line will take
+      const lineLength = line.length;
+      const wrappedLines = Math.ceil(lineLength / CHARS_PER_LINE);
+      const lineHeight = wrappedLines * LINE_HEIGHT;
 
-      // If we exceed lines or chars, push currentPage and reset
-      if (lineCount >= maxLines || charCount + line.length > maxChars) {
+      // Check if adding this line would overflow the writing area
+      if (currentHeight + lineHeight > WRITING_AREA_HEIGHT) {
+        // Current page is full, push it and start new page
+        pagesArr.push(currentPage);
+        currentPage = line;
+        currentHeight = lineHeight;
+      } else {
+        // Add line to current page
         if (currentPage) {
-          pagesArr.push(currentPage);
-          currentPage = "";
-          lineCount = 0;
-          charCount = 0;
+          currentPage += "\n";
+          currentHeight += LINE_HEIGHT; // Account for newline
         }
+        currentPage += line;
+        currentHeight += lineHeight;
       }
 
-      // Add line to current page
-      if (currentPage) {
-        currentPage += "\n";
-        charCount++; // newline character
-      }
-      currentPage += line;
-      lineCount++;
-      charCount += line.length;
-
-      // If a single line alone is huge, chunk it
-      if (line.length > maxChars) {
+      // Handle extremely long single lines by forcing page breaks
+      if (lineLength > CHARS_PER_PAGE) {
         let remainingText = line;
-        while (remainingText.length > 0) {
-          const chunk = remainingText.slice(0, maxChars);
+        while (remainingText.length > CHARS_PER_PAGE) {
+          const chunk = remainingText.slice(0, CHARS_PER_PAGE);
           pagesArr.push(chunk);
-          remainingText = remainingText.slice(maxChars);
+          remainingText = remainingText.slice(CHARS_PER_PAGE);
         }
-        // Reset
-        currentPage = "";
-        lineCount = 0;
-        charCount = 0;
+        currentPage = remainingText;
+        currentHeight =
+          Math.ceil(remainingText.length / CHARS_PER_LINE) * LINE_HEIGHT;
       }
     }
 
+    // Don't forget the last page
     if (currentPage) {
       pagesArr.push(currentPage);
     }
@@ -331,7 +323,10 @@ function App() {
           }}
         />
 
-        <div className="p-12 h-full flex flex-col relative z-10">
+        <div
+          id="writing-area"
+          className="p-12 h-full flex flex-col relative z-10"
+        >
           <h2
             className={`${calculateTitleSize(
               title
