@@ -260,12 +260,14 @@ function App() {
               </div>
             </div>
             <div className="mt-6 flex justify-between">
-              <button
-                onClick={loadTestingData}
-                className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-2 px-4 rounded"
-              >
-                Load Testing Data
-              </button>
+              {import.meta.env.DEV && (
+                <button
+                  onClick={loadTestingData}
+                  className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-2 px-4 rounded"
+                >
+                  Load Testing Data
+                </button>
+              )}
               <button
                 onClick={toggleModal}
                 className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
