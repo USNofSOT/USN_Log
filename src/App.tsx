@@ -140,10 +140,18 @@ function App() {
     const element = document.getElementById("preview");
     if (!element) return;
 
+    const goldSpan = document.getElementById("gold-span");
+    const doubloonsSpan = document.getElementById("doubloons-span");
+    goldSpan?.classList.add("pb-8");
+    doubloonsSpan?.classList.add("pb-8");
+
     const canvas = await html2canvas(element, {
       scale: 2,
       useCORS: true,
     });
+
+    goldSpan?.classList.remove("pb-8");
+    doubloonsSpan?.classList.remove("pb-8");
 
     canvas.toBlob((blob) => {
       if (blob) {
@@ -473,6 +481,7 @@ function App() {
                     {formatList(events).map((event, index) => (
                       <li
                         key={index}
+                        className="li-elem"
                         style={{
                           breakInside: "avoid-column",
                           marginBottom: "0.25rem",
@@ -488,7 +497,7 @@ function App() {
                     Crew Manifest
                   </h3>
                   <ul
-                    className="list-disc pl-6 font-['Indie_Flower'] text-lg text-black"
+                    className="li-elem list-disc pl-6 font-['Indie_Flower'] text-lg text-black"
                     style={{
                       columns: "2",
                       columnGap: "1rem",
@@ -498,6 +507,7 @@ function App() {
                     {formatList(crew).map((member, index) => (
                       <li
                         key={index}
+                        className="li-elem"
                         style={{
                           breakInside: "avoid-column",
                           marginBottom: "0.25rem",
@@ -518,7 +528,10 @@ function App() {
                       alt="Gold"
                       className="w-8 h-8"
                     />
-                    <span className="font-['Indie_Flower'] text-2xl text-black">
+                    <span
+                      id="gold-span"
+                      className="font-['Indie_Flower'] text-2xl text-black"
+                    >
                       {gold || "0"}
                     </span>
                   </div>
@@ -528,7 +541,10 @@ function App() {
                       alt="Doubloons"
                       className="w-8 h-8"
                     />
-                    <span className="font-['Indie_Flower'] text-2xl text-black">
+                    <span
+                      id="doubloons-span"
+                      className="font-['Indie_Flower'] text-2xl text-black"
+                    >
                       {doubloons || "0"}
                     </span>
                   </div>
