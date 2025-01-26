@@ -30,6 +30,53 @@ function App() {
     // Add more ships and their corresponding image paths here
   };
 
+  // Load state from local storage on component mount
+  useEffect(() => {
+    const savedTitle = localStorage.getItem("title");
+    const savedBody = localStorage.getItem("body");
+    const savedSignature = localStorage.getItem("signature");
+    const savedEvents = localStorage.getItem("events");
+    const savedCrew = localStorage.getItem("crew");
+    const savedGold = localStorage.getItem("gold");
+    const savedDoubloons = localStorage.getItem("doubloons");
+    const savedSubtitle = localStorage.getItem("subtitle");
+
+    if (savedTitle) setTitle(savedTitle);
+    if (savedBody) setBody(savedBody);
+    if (savedSignature) setSignature(savedSignature);
+    if (savedEvents) setEvents(savedEvents);
+    if (savedCrew) setCrew(savedCrew);
+    if (savedGold) setGold(savedGold);
+    if (savedDoubloons) setDoubloons(savedDoubloons);
+    if (savedSubtitle) setSubtitle(savedSubtitle);
+  }, []);
+
+  // Debounce function
+  const debounce = (func: Function, delay: number) => {
+    let timeoutId: NodeJS.Timeout;
+    return (...args: any[]) => {
+      if (timeoutId) clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => func(...args), delay);
+    };
+  };
+
+  // Save state to local storage with debounce
+  useEffect(() => {
+    const saveToLocalStorage = () => {
+      localStorage.setItem("title", title);
+      localStorage.setItem("body", body);
+      localStorage.setItem("signature", signature);
+      localStorage.setItem("events", events);
+      localStorage.setItem("crew", crew);
+      localStorage.setItem("gold", gold);
+      localStorage.setItem("doubloons", doubloons);
+      localStorage.setItem("subtitle", subtitle);
+    };
+
+    const debouncedSave = debounce(saveToLocalStorage, 500); // 500ms delay
+    debouncedSave();
+  }, [title, body, signature, events, crew, gold, doubloons, subtitle]);
+
   useEffect(() => {
     // Convert images to base64 on component mount
     const loadImage = async (url: string): Promise<string> => {
