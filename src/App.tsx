@@ -19,7 +19,6 @@ function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [titleFont, setTitleFont] = useState("Satisfy");
   const [bodyFont, setBodyFont] = useState("Indie_Flower");
-  const [signatureFont, setSignatureFont] = useState("Dancing_Script");
 
   const shipLogos = {
     audacious: "/USN_Log/ships/audacious.png",
@@ -179,21 +178,6 @@ function App() {
                   <option value="Satisfy">Satisfy</option>
                   <option value="Indie_Flower">Indie Flower</option>
                   <option value="Dancing_Script">Dancing Script</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  Signature Font
-                </label>
-                <select
-                  value={signatureFont}
-                  onChange={(e) => setSignatureFont(e.target.value)}
-                  className="w-full p-2 bg-gray-700 rounded border border-gray-600 text-white"
-                >
-                  <option value="Satisfy">Satisfy</option>
-                  <option value="Dancing_Script">Dancing Script</option>
-                  <option value="Indie_Flower">Indie Flower</option>
                 </select>
               </div>
             </div>
@@ -450,7 +434,7 @@ function App() {
                 </div>
 
                 <div
-                  className={`font-['${signatureFont}'] text-4xl text-black font-bold`}
+                  className={`font-['Dancing_Script'] text-4xl text-black font-bold`}
                   style={{
                     transform: "rotate(-4deg)",
                     textShadow: "1px 1px 2px rgba(0,0,0,0.1)",
