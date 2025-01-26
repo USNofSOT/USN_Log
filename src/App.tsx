@@ -16,6 +16,10 @@ function App() {
   const [goldBase64, setGoldBase64] = useState("");
   const [doubloonBase64, setDoubloonBase64] = useState("");
   const [selectedShip, setSelectedShip] = useState("audacious");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [titleFont, setTitleFont] = useState("Satisfy");
+  const [bodyFont, setBodyFont] = useState("Indie_Flower");
+  const [signatureFont, setSignatureFont] = useState("Dancing_Script");
 
   const shipLogos = {
     audacious: "/USN_Log/ships/audacious.png",
@@ -124,14 +128,86 @@ function App() {
     setDoubloons("");
   };
 
+  const toggleModal = () => {
+    setIsModalOpen(!isModalOpen);
+  };
+
   return (
     <div className="min-h-screen bg-[#1a1a1a] text-white">
       {/* Header */}
-      <header className="bg-[#2a2a2a] p-4 text-center">
+      <header className="bg-[#2a2a2a] p-4 text-center flex justify-between items-center">
         <h1 className="text-3xl font-bold text-amber-500">
           SoT USN Voyage Log Generator
         </h1>
+        <button
+          onClick={toggleModal}
+          className="bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded"
+        >
+          Settings
+        </button>
       </header>
+
+      {/* Settings Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
+          <div className="bg-[#2a2a2a] p-6 rounded-lg shadow-lg w-1/3 text-white">
+            <h2 className="text-2xl font-bold mb-4">Settings</h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Title Font
+                </label>
+                <select
+                  value={titleFont}
+                  onChange={(e) => setTitleFont(e.target.value)}
+                  className="w-full p-2 bg-gray-700 rounded border border-gray-600 text-white"
+                >
+                  <option value="Satisfy">Satisfy</option>
+                  <option value="Dancing_Script">Dancing Script</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Log Entry Font
+                </label>
+                <select
+                  value={bodyFont}
+                  onChange={(e) => setBodyFont(e.target.value)}
+                  className="w-full p-2 bg-gray-700 rounded border border-gray-600 text-white"
+                >
+                  <option value="Satisfy">Satisfy</option>
+                  <option value="Indie_Flower">Indie Flower</option>
+                  <option value="Dancing_Script">Dancing Script</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Signature Font
+                </label>
+                <select
+                  value={signatureFont}
+                  onChange={(e) => setSignatureFont(e.target.value)}
+                  className="w-full p-2 bg-gray-700 rounded border border-gray-600 text-white"
+                >
+                  <option value="Satisfy">Satisfy</option>
+                  <option value="Dancing_Script">Dancing Script</option>
+                  <option value="Indie_Flower">Indie Flower</option>
+                </select>
+              </div>
+            </div>
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={toggleModal}
+                className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="container mx-auto p-4 flex gap-4">
         {/* Editor Section */}
@@ -297,13 +373,13 @@ function App() {
               <h2
                 className={`${calculateTitleSize(
                   title
-                )} text-center ml-16 mr-16 mt-12 mb-8 font-['Satisfy'] text-black transition-all duration-200 whitespace-pre-wrap`}
+                )} text-center ml-16 mr-16 mt-12 mb-8 font-['${titleFont}'] text-black transition-all duration-200 whitespace-pre-wrap`}
               >
                 {title || "Log Title"}
               </h2>
 
               <div
-                className={`font-['Indie_Flower'] ${calculateBodySize(
+                className={`font-['${bodyFont}'] ${calculateBodySize(
                   body
                 )} flex-grow whitespace-pre-wrap text-black leading-relaxed transition-all duration-200 p-2`}
               >
@@ -374,7 +450,7 @@ function App() {
                 </div>
 
                 <div
-                  className="font-['Dancing_Script'] text-4xl text-black font-bold"
+                  className={`font-['${signatureFont}'] text-4xl text-black font-bold`}
                   style={{
                     transform: "rotate(-4deg)",
                     textShadow: "1px 1px 2px rgba(0,0,0,0.1)",
