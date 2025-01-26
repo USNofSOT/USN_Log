@@ -419,9 +419,24 @@ function App() {
                   <h3 className="font-['Satisfy'] text-2xl text-black mb-2">
                     Crew Manifest
                   </h3>
-                  <ul className="list-disc pl-6 font-['Indie_Flower'] text-lg space-y-1 text-black">
+                  <ul
+                    className="list-disc pl-6 font-['Indie_Flower'] text-lg text-black"
+                    style={{
+                      columns: "2",
+                      columnGap: "1rem",
+                      breakInside: "avoid-column",
+                    }}
+                  >
                     {formatList(crew).map((member, index) => (
-                      <li key={index}>{member}</li>
+                      <li
+                        key={index}
+                        style={{
+                          breakInside: "avoid-column",
+                          marginBottom: "0.25rem",
+                        }}
+                      >
+                        {member}
+                      </li>
                     ))}
                   </ul>
                 </div>
