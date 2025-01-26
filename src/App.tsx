@@ -98,6 +98,19 @@ function App() {
     );
   }, []);
 
+  const loadTestingData = () => {
+    setTitle("Test Title");
+    setBody(
+      "This is a test log entry. It contains some sample text for testing purposes."
+    );
+    setSignature("Test Signature");
+    setEvents("Event 1\nEvent 2\nEvent 3");
+    setCrew("Crew Member 1\nCrew Member 2\nCrew Member 3");
+    setGold("100");
+    setDoubloons("50");
+    setSubtitle("Test Subtitle");
+  };
+
   const calculateTitleSize = (text: string) => {
     if (!text) return "text-7xl";
     if (text.length <= 20) return "text-6xl";
@@ -245,7 +258,13 @@ function App() {
                 </select>
               </div>
             </div>
-            <div className="mt-6 flex justify-end">
+            <div className="mt-6 flex justify-between">
+              <button
+                onClick={loadTestingData}
+                className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-2 px-4 rounded"
+              >
+                Load Testing Data
+              </button>
               <button
                 onClick={toggleModal}
                 className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
