@@ -15,6 +15,13 @@ function App() {
   const [doubloons, setDoubloons] = useState("");
   const [goldBase64, setGoldBase64] = useState("");
   const [doubloonBase64, setDoubloonBase64] = useState("");
+  const [selectedShip, setSelectedShip] = useState("audacious");
+
+  const shipLogos = {
+    audacious: "/USN_Log/ships/audacious.png",
+    odin: "/USN_Log/ships/odin.png",
+    // Add more ships and their corresponding image paths here
+  };
 
   useEffect(() => {
     // Convert images to base64 on component mount
@@ -38,11 +45,11 @@ function App() {
   }, []);
 
   const calculateTitleSize = (text: string) => {
-    if (!text) return "text-4xl";
-    if (text.length <= 20) return "text-4xl";
-    if (text.length <= 30) return "text-3xl";
-    if (text.length <= 40) return "text-2xl";
-    return "text-xl";
+    if (!text) return "text-7xl";
+    if (text.length <= 20) return "text-6xl";
+    if (text.length <= 30) return "text-5xl";
+    if (text.length <= 40) return "text-4xl";
+    return "text-3xl";
   };
 
   const calculateBodySize = (text: string) => {
@@ -131,13 +138,27 @@ function App() {
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium mb-2">
+                Select Ship
+              </label>
+              <select
+                value={selectedShip}
+                onChange={(e) => setSelectedShip(e.target.value)}
+                className="w-full p-2 bg-[#3a3a3a] rounded border border-gray-600 text-white"
+              >
+                <option value="audacious">Audacious</option>
+                <option value="odin">Odin</option>
+                {/* Add more options here */}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">
                 Log Title
               </label>
-              <input
-                type="text"
+              <textarea
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full p-2 bg-[#3a3a3a] rounded border border-gray-600 text-white"
+                className="w-full p-2 bg-[#3a3a3a] rounded border border-gray-600 text-white h-16"
                 placeholder="Enter log title..."
               />
             </div>
@@ -257,11 +278,24 @@ function App() {
               boxShadow: "0 0 20px rgba(0,0,0,0.3)",
             }}
           >
-            <div className="p-12 h-full flex flex-col">
+            {/* Ship Logo */}
+            <img
+              src={shipLogos[selectedShip]}
+              alt="Ship Logo"
+              className="absolute inset-0 m-auto"
+              style={{
+                width: "50%",
+                height: "auto",
+                opacity: 0.3,
+                zIndex: 0,
+              }}
+            />
+
+            <div className="p-12 h-full flex flex-col relative z-10">
               <h2
                 className={`${calculateTitleSize(
                   title
-                )} text-center ml-16 mr-16 mt-12 mb-8 font-['Satisfy'] text-black transition-all duration-200`}
+                )} text-center ml-16 mr-16 mt-12 mb-8 font-['Satisfy'] text-black transition-all duration-200 whitespace-pre-wrap`}
               >
                 {title || "Log Title"}
               </h2>
