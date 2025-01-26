@@ -2,8 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Printer } from "lucide-react";
 import html2pdf from "html2pdf.js";
 import html2canvas from "html2canvas";
-import goldImg from "./gold.webp";
-import doubloon from "./doubloon.webp";
 
 function App() {
   const [title, setTitle] = useState("");
@@ -76,27 +74,6 @@ function App() {
     const debouncedSave = debounce(saveToLocalStorage, 500); // 500ms delay
     debouncedSave();
   }, [title, body, signature, events, crew, gold, doubloons, subtitle]);
-
-  useEffect(() => {
-    // Convert images to base64 on component mount
-    const loadImage = async (url: string): Promise<string> => {
-      const response = await fetch(url);
-      const blob = await response.blob();
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
-      });
-    };
-
-    Promise.all([loadImage(goldImg), loadImage(doubloon)]).then(
-      ([goldData, doubloonData]) => {
-        setGoldBase64(goldData);
-        setDoubloonBase64(doubloonData);
-      }
-    );
-  }, []);
 
   const loadTestingData = () => {
     setTitle("Test Title");
@@ -537,7 +514,7 @@ function App() {
                 <div className="flex gap-8">
                   <div className="flex pl-4 items-center gap-2">
                     <img
-                      src={goldBase64 || goldImg}
+                      src="/USN_Log/gold.webp"
                       alt="Gold"
                       className="w-8 h-8"
                     />
@@ -547,7 +524,7 @@ function App() {
                   </div>
                   <div className="flex items-center gap-2">
                     <img
-                      src={doubloonBase64 || doubloon}
+                      src="/USN_Log/doubloon.webp"
                       alt="Doubloons"
                       className="w-8 h-8"
                     />
