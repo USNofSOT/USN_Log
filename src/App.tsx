@@ -11,8 +11,6 @@ function App() {
   const [crew, setCrew] = useState("");
   const [gold, setGold] = useState("");
   const [doubloons, setDoubloons] = useState("");
-  const [goldBase64, setGoldBase64] = useState("");
-  const [doubloonBase64, setDoubloonBase64] = useState("");
   const [selectedShip, setSelectedShip] = useState("audacious");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [titleFont, setTitleFont] = useState("Satisfy");
@@ -20,12 +18,18 @@ function App() {
   const [subtitle, setSubtitle] = useState("");
   const [isCopyModalOpen, setIsCopyModalOpen] = useState(false);
 
-  const shipLogos = {
+  // For tabbing between preview pages
+  const [activePageIndex, setActivePageIndex] = useState(0);
+
+  // We’ll split body text into pages. Each item in pages[] is the chunk for that page.
+  const [pages, setPages] = useState<string[]>([]);
+
+  // Ship logos
+  const shipLogos: Record<string, string> = {
     audacious: "/USN_Log/ships/audacious.png",
     odin: "/USN_Log/ships/odin.png",
     tyr: "/USN_Log/ships/tyr.png",
     thor: "/USN_Log/ships/thor.png",
-    // Add more ships and their corresponding image paths here
   };
 
   // Load state from local storage on component mount
@@ -70,17 +74,28 @@ function App() {
       localStorage.setItem("doubloons", doubloons);
       localStorage.setItem("subtitle", subtitle);
     };
-
     const debouncedSave = debounce(saveToLocalStorage, 500); // 500ms delay
     debouncedSave();
   }, [title, body, signature, events, crew, gold, doubloons, subtitle]);
 
+  // Simple test data (only visible in dev)
   const loadTestingData = () => {
     setTitle("Test Title");
     setBody(
-      "This is a test log entry. It contains some sample text for testing purposes."
+      `Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+      Proin suscipit ligula quam, at lobortis nulla convallis nec. 
+      Phasellus interdum dui sit amet leo sagittis, in consequat urna pretium.
+      Aliquam erat volutpat. Morbi pretium sollicitudin nibh in ultrices.
+      Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
+      
+      Vestibulum sed diam in nulla blandit dapibus vitae nec nisl. Morbi fringilla tristique risus non condimentum.
+      Integer et ipsum maximus, sodales felis a, varius enim. Duis finibus, ex a feugiat consequat, nisi leo vehicula risus, 
+      at congue ex justo sed ex. Etiam auctor, nisi vel dapibus sodales, ex eros pharetra justo, nec sodales erat mauris eget odio.
+
+      (Repeat this text enough times to ensure multiple pages of content, if needed.)
+      `
     );
-    setSignature("Test Signature");
+    setSignature("Capt. Test");
     setEvents("Event 1\nEvent 2\nEvent 3");
     setCrew("Crew Member 1\nCrew Member 2\nCrew Member 3");
     setGold("100");
@@ -88,6 +103,7 @@ function App() {
     setSubtitle("Test Subtitle");
   };
 
+  // Simple dynamic sizing
   const calculateTitleSize = (text: string) => {
     if (!text) return "text-7xl";
     if (text.length <= 20) return "text-6xl";
@@ -97,72 +113,139 @@ function App() {
   };
 
   const calculateBodySize = (text: string) => {
-    if (!text) return "text-xl";
-    if (text.length <= 500) return "text-xl";
-    if (text.length <= 1000) return "text-lg";
+    if (!text) return "text-base";
+    if (text.length <= 500) return "text-base";
+    if (text.length <= 1000) return "text-base";
     if (text.length <= 2000) return "text-base";
-    if (text.length <= 3000) return "text-sm";
-    return "text-xs";
+    if (text.length <= 3000) return "text-base";
+    return "text-base";
   };
 
-  function makeFileName() {
-    if (!title) return "Voyage_Log";
-    const titleArr = title.split(" ");
-    return titleArr.join("-") + ".pdf";
+  function makeFileName(pageIndex?: number) {
+    let base = title ? title.replace(/\s+/g, "-") : "Voyage_Log";
+    if (pageIndex != null) {
+      base += `_page${pageIndex + 1}`;
+    }
+    return base + ".png";
   }
 
+  // Convert multiline input to array
   const formatList = (text: string) => {
     if (!text) return [];
     return text.split("\n").filter((item) => item.trim() !== "");
   };
 
+  // Splits body text into multiple pages (naive: by character limit).
+  // In a real-world scenario, you'd measure text height or use a more advanced approach.
+  const MAX_LINES_PER_PAGE = 30;
+  const MAX_CHARS_PER_PAGE = 1400;
+
+  function splitTextIntoPages(longText: string): string[] {
+    if (!longText) return [""];
+    const pagesArr: string[] = [];
+    const lines = longText.split("\n");
+    let currentPage = "";
+    let lineCount = 0;
+    let charCount = 0;
+
+    for (const line of lines) {
+      // Check if we need to start a new page based on either condition
+      if (
+        lineCount >= MAX_LINES_PER_PAGE ||
+        charCount + line.length > MAX_CHARS_PER_PAGE
+      ) {
+        if (currentPage) {
+          pagesArr.push(currentPage);
+          currentPage = "";
+          lineCount = 0;
+          charCount = 0;
+        }
+      }
+
+      // Add line to current page
+      if (currentPage) {
+        currentPage += "\n";
+        charCount++; // Account for newline character
+      }
+      currentPage += line;
+      lineCount++;
+      charCount += line.length;
+
+      // Handle case where single line exceeds char limit
+      if (line.length > MAX_CHARS_PER_PAGE) {
+        let remainingText = line;
+        while (remainingText.length > 0) {
+          const chunk = remainingText.slice(0, MAX_CHARS_PER_PAGE);
+          pagesArr.push(chunk);
+          remainingText = remainingText.slice(MAX_CHARS_PER_PAGE);
+        }
+        currentPage = "";
+        lineCount = 0;
+        charCount = 0;
+      }
+    }
+
+    // Add final page if there's remaining content
+    if (currentPage) {
+      pagesArr.push(currentPage);
+    }
+
+    return pagesArr;
+  }
+
+  // Update `pages` whenever `body` changes
+  useEffect(() => {
+    const splitted = splitTextIntoPages(body);
+    setPages(splitted);
+    // Jump to the last page, so if user is typing, they see the new text
+    setActivePageIndex(splitted.length - 1);
+  }, [body]);
+
+  // PDF generation with multi-page
+  // We'll have one container that holds all pages with a forced page-break.
+  // A single call to html2pdf will produce multiple pages automatically.
   const generatePDF = () => {
-    const element = document.getElementById("preview");
+    const element = document.getElementById("pdf-container");
+    if (!element) return;
+
     const opt = {
       margin: 0,
-      filename: makeFileName(),
+      filename: title ? title.replace(/\s+/g, "-") + ".pdf" : "Voyage_Log.pdf",
       image: { type: "jpeg", quality: 0.98 },
       html2canvas: {
         scale: 2,
-        height: 1056, // Standard US Letter height at 96 DPI
-        width: 816, // Standard US Letter width at 96 DPI
+        width: 816,
+        height: 1056,
       },
       jsPDF: {
         unit: "px",
         format: [816, 1056],
         orientation: "portrait",
       },
+      pagebreak: { mode: ["avoid-all", "css"] },
     };
     html2pdf().set(opt).from(element).save();
   };
 
+  // Generate images from each "page-preview" container individually
   const generateImage = async () => {
-    const element = document.getElementById("preview");
-    if (!element) return;
+    const pageElements = document.querySelectorAll(".page-preview");
+    if (!pageElements.length) return;
 
-    const goldSpan = document.getElementById("gold-span");
-    const doubloonsSpan = document.getElementById("doubloons-span");
-    goldSpan?.classList.add("pb-8");
-    doubloonsSpan?.classList.add("pb-8");
-
-    const canvas = await html2canvas(element, {
-      scale: 2,
-      useCORS: true,
-    });
-
-    goldSpan?.classList.remove("pb-8");
-    doubloonsSpan?.classList.remove("pb-8");
-
-    canvas.toBlob((blob) => {
-      if (blob) {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = makeFileName().replace(".pdf", ".png");
-        a.click();
-        URL.revokeObjectURL(url);
-      }
-    }, "image/png");
+    for (let i = 0; i < pageElements.length; i++) {
+      const pageEl = pageElements[i] as HTMLElement;
+      const canvas = await html2canvas(pageEl, { scale: 2, useCORS: true });
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = makeFileName(i);
+          a.click();
+          URL.revokeObjectURL(url);
+        }
+      }, "image/png");
+    }
   };
 
   const resetState = () => {
@@ -174,6 +257,7 @@ function App() {
     setCrew("");
     setGold("");
     setDoubloons("");
+    setActivePageIndex(0);
   };
 
   const toggleModal = () => {
@@ -193,6 +277,11 @@ function App() {
     navigator.clipboard.writeText(text);
     alert("Copied to clipboard!");
   };
+
+  // Define styles so that inactive pages remain in the DOM but are visually hidden.
+  // "inactive-page" is still rendered but set to zero-size & invisible; this lets html2canvas see it.
+  const visiblePageStyle = `relative opacity-100 w-[816px] h-[1190px]`;
+  const hiddenPageStyle = `absolute opacity-0 pointer-events-none w-[816px] h-[1190px] -left-[9999px]`;
 
   return (
     <div className="min-h-screen bg-[#1a1a1a] text-white">
@@ -264,6 +353,7 @@ function App() {
         </div>
       )}
 
+      {/* Main Layout */}
       <div className="container mx-auto p-4 flex gap-4">
         {/* Editor Section */}
         <div className="w-1/2 bg-[#2a2a2a] p-6 rounded-lg">
@@ -281,7 +371,6 @@ function App() {
                 <option value="odin">Odin</option>
                 <option value="tyr">Tyr</option>
                 <option value="thor">Thor</option>
-                {/* Add more options here */}
               </select>
             </div>
 
@@ -369,8 +458,7 @@ function App() {
                 value={signature}
                 onChange={(e) => setSignature(e.target.value)}
                 className="w-full p-2 bg-[#3a3a3a] rounded border border-gray-600 text-white"
-                rows="4"
-                cols="50"
+                rows={4}
               />
             </div>
 
@@ -380,7 +468,7 @@ function App() {
                 value={subtitle}
                 onChange={(e) => setSubtitle(e.target.value)}
                 className="w-full p-2 bg-[#3a3a3a] rounded border border-gray-600 text-white"
-                rows="2"
+                rows={2}
                 placeholder="Enter rank or custom subtitle..."
               />
             </div>
@@ -399,7 +487,7 @@ function App() {
                 className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded flex items-center justify-center gap-2"
               >
                 <Printer size={20} />
-                Generate Image
+                Generate Image(s)
               </button>
 
               <button
@@ -419,156 +507,184 @@ function App() {
           </div>
         </div>
 
-        {/* Preview Section */}
+        {/* Preview Section: Tab Navigation + Pages */}
         <div className="w-1/2">
-          <div
-            id="preview"
-            className="bg-[url('/parchment.png')] bg-cover rounded-lg relative pb-28"
-            style={{
-              width: "816px",
-              height: "1190px",
-              boxShadow: "0 0 20px rgba(0,0,0,0.3)",
-            }}
-          >
-            {/* Ship Logo */}
-            <img
-              src={shipLogos[selectedShip]}
-              alt="Ship Logo"
-              className="absolute inset-0 m-auto"
-              style={{
-                width: "50%",
-                height: "auto",
-                opacity: 0.3,
-                zIndex: 0,
-              }}
-            />
+          {/* Tab Navigation */}
+          {pages.length > 1 && (
+            <div className="flex gap-2 mb-2">
+              {pages.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setActivePageIndex(idx)}
+                  className={`px-3 py-1 rounded ${
+                    idx === activePageIndex
+                      ? "bg-blue-600"
+                      : "bg-gray-600 hover:bg-gray-500"
+                  }`}
+                >
+                  Page {idx + 1}
+                </button>
+              ))}
+            </div>
+          )}
 
-            <div className="p-12 h-full flex flex-col relative z-10">
-              <h2
-                className={`${calculateTitleSize(
-                  title
-                )} text-center ml-16 mr-16 mt-12 mb-8 font-['${titleFont}'] text-black transition-all duration-200 whitespace-pre-wrap`}
-              >
-                {title || "Log Title"}
-              </h2>
-
-              <div
-                className={`font-['${bodyFont}'] ${calculateBodySize(
-                  body
-                )} flex-grow whitespace-pre-wrap text-black leading-relaxed transition-all duration-200 p-2`}
-              >
-                {body || "Your log entry will appear here..."}
-              </div>
-
-              {/* Events and Crew Section */}
-              <div
-                className={`grid grid-cols-2 gap-8 ml-6 mt-4 ${
-                  subtitle ? "mb-6" : ""
-                }`}
-              >
-                <div>
-                  <h3 className="font-['Satisfy'] text-2xl text-black mb-2">
-                    Notable Events
-                  </h3>
-                  <ul
-                    className="list-none font-['Indie_Flower'] text-lg text-black"
-                    style={{
-                      columns: "2",
-                      columnGap: "1rem",
-                      breakInside: "avoid-column",
-                    }}
-                  >
-                    {formatList(events).map((event, index) => (
-                      <li
-                        key={index}
-                        className="li-elem"
-                        style={{
-                          breakInside: "avoid-column",
-                          marginBottom: "0.25rem",
-                        }}
-                      >
-                        {event}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <div>
-                  <h3 className="font-['Satisfy'] text-2xl text-black mb-2">
-                    Crew Manifest
-                  </h3>
-                  <ul
-                    className="list-none li-elem font-['Indie_Flower'] text-lg text-black"
-                    style={{
-                      columns: "2",
-                      columnGap: "1rem",
-                      breakInside: "avoid-column",
-                    }}
-                  >
-                    {formatList(crew).map((member, index) => (
-                      <li
-                        key={index}
-                        className="li-elem"
-                        style={{
-                          breakInside: "avoid-column",
-                          marginBottom: "0.25rem",
-                        }}
-                      >
-                        {member}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-
-              <div className="flex justify-between items-end">
-                <div className="flex gap-8">
-                  <div className="flex pl-4 items-center gap-2">
-                    <img
-                      src="/USN_Log/gold.webp"
-                      alt="Gold"
-                      className="w-8 h-8"
-                    />
-                    <span
-                      id="gold-span"
-                      className="font-['Indie_Flower'] text-2xl text-black"
-                    >
-                      {gold || "0"}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <img
-                      src="/USN_Log/doubloon.webp"
-                      alt="Doubloons"
-                      className="w-8 h-8"
-                    />
-                    <span
-                      id="doubloons-span"
-                      className="font-['Indie_Flower'] text-2xl text-black"
-                    >
-                      {doubloons || "0"}
-                    </span>
-                  </div>
-                </div>
-
+          {/* Container that we'll pass to html2pdf for multi-page PDF */}
+          <div id="pdf-container">
+            {/* Render all pages (each with a forced page-break). 
+                But visually only the active page is visible; the others are still in the DOM 
+                (via hiddenPageStyle) so html2canvas can capture them. */}
+            {pages.map((pageText, idx) => {
+              // Choose style based on whether page is active or not
+              const pageStyle =
+                idx === activePageIndex ? visiblePageStyle : hiddenPageStyle;
+              return (
                 <div
-                  className={`font-['Dancing_Script'] absolute right-16
-                    bottom-0 text-5xl text-black font-bold whitespace-pre-wrap`}
+                  key={idx}
+                  className={`page-preview bg-[url('/parchment.png')] bg-cover rounded-lg pb-28 mb-8 ${pageStyle}`}
                   style={{
-                    transform: "rotate(-4deg)",
-                    textShadow: "1px 1px 2px rgba(0,0,0,0.1)",
+                    boxShadow: "0 0 20px rgba(0,0,0,0.3)",
+                    pageBreakAfter: "always",
                   }}
                 >
-                  {signature || "Your Signature"}
-                  {subtitle && (
-                    <div className="text-3xl mt-2 text-right">{subtitle}</div>
-                  )}
+                  {/* Ship Logo */}
+                  <img
+                    src={shipLogos[selectedShip]}
+                    alt="Ship Logo"
+                    className="absolute inset-0 m-auto"
+                    style={{
+                      width: "50%",
+                      height: "auto",
+                      opacity: 0.3,
+                      zIndex: 0,
+                    }}
+                  />
+
+                  <div className="p-12 h-full flex flex-col relative z-10">
+                    <h2
+                      className={`${calculateTitleSize(
+                        title
+                      )} text-center ml-16 mr-16 mt-12 mb-8 font-['${titleFont}'] text-black transition-all duration-200 whitespace-pre-wrap`}
+                    >
+                      {title || "Log Title"}
+                    </h2>
+
+                    <div
+                      className={`font-['${bodyFont}'] ${calculateBodySize(
+                        body
+                      )} flex-grow whitespace-pre-wrap text-black leading-relaxed transition-all duration-200 p-2`}
+                    >
+                      {pageText || "Your log entry will appear here..."}
+                    </div>
+
+                    {/* Events and Crew Section (replicated on each page) */}
+                    <div
+                      className={`grid grid-cols-2 gap-8 ml-6 mt-4 ${
+                        subtitle ? "mb-6" : ""
+                      }`}
+                    >
+                      <div>
+                        <h3 className="font-['Satisfy'] text-2xl text-black mb-2">
+                          Notable Events
+                        </h3>
+                        <ul
+                          className="list-none font-['Indie_Flower'] text-lg text-black"
+                          style={{
+                            columns: "2",
+                            columnGap: "1rem",
+                            breakInside: "avoid-column",
+                          }}
+                        >
+                          {formatList(events).map((event, i) => (
+                            <li
+                              key={i}
+                              className="li-elem mb-1"
+                              style={{ breakInside: "avoid-column" }}
+                            >
+                              {event}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      <div>
+                        <h3 className="font-['Satisfy'] text-2xl text-black mb-2">
+                          Crew Manifest
+                        </h3>
+                        <ul
+                          className="list-none li-elem font-['Indie_Flower'] text-lg text-black"
+                          style={{
+                            columns: "2",
+                            columnGap: "1rem",
+                            breakInside: "avoid-column",
+                          }}
+                        >
+                          {formatList(crew).map((member, i) => (
+                            <li
+                              key={i}
+                              className="li-elem mb-1"
+                              style={{ breakInside: "avoid-column" }}
+                            >
+                              {member}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-between items-end">
+                      <div className="flex gap-8">
+                        <div className="flex pl-4 items-center gap-2">
+                          <img
+                            src="/USN_Log/gold.webp"
+                            alt="Gold"
+                            className="w-8 h-8"
+                          />
+                          <span
+                            id="gold-span"
+                            className="font-['Indie_Flower'] text-2xl text-black"
+                          >
+                            {gold || "0"}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <img
+                            src="/USN_Log/doubloon.webp"
+                            alt="Doubloons"
+                            className="w-8 h-8"
+                          />
+                          <span
+                            id="doubloons-span"
+                            className="font-['Indie_Flower'] text-2xl text-black"
+                          >
+                            {doubloons || "0"}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div
+                        className={`font-['Dancing_Script'] absolute right-16
+                          bottom-0 text-5xl text-black font-bold whitespace-pre-wrap`}
+                        style={{
+                          transform: "rotate(-4deg)",
+                          textShadow: "1px 1px 2px rgba(0,0,0,0.1)",
+                        }}
+                      >
+                        {signature || "Your Signature"}
+                        {subtitle && (
+                          <div className="text-3xl mt-2 text-right">
+                            {subtitle}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
+              );
+            })}
           </div>
         </div>
       </div>
 
+      {/* Copy Modal */}
       {isCopyModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
           <div className="bg-[#2a2a2a] p-6 rounded-lg shadow-lg w-1/3 text-white">
