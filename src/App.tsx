@@ -20,6 +20,7 @@ function App() {
   const shipLogos = {
     audacious: "/USN_Log/ships/audacious.png",
     odin: "/USN_Log/ships/odin.png",
+    tyr: "/USN_Log/ships/tyr.png",
     // Add more ships and their corresponding image paths here
   };
 
@@ -147,6 +148,7 @@ function App() {
               >
                 <option value="audacious">Audacious</option>
                 <option value="odin">Odin</option>
+                <option value="tyr">Tyr</option>
                 {/* Add more options here */}
               </select>
             </div>
