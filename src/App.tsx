@@ -335,10 +335,10 @@ function App() {
         <div className="w-1/2">
           <div
             id="preview"
-            className="bg-[url('/parchment.png')] bg-cover rounded-lg relative"
+            className="bg-[url('/parchment.png')] bg-cover rounded-lg relative pb-32"
             style={{
               width: "816px",
-              height: "1056px",
+              height: "1190px",
               boxShadow: "0 0 20px rgba(0,0,0,0.3)",
             }}
           >
