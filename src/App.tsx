@@ -471,7 +471,7 @@ function App() {
                     Notable Events
                   </h3>
                   <ul
-                    className="list-disc pl-6 font-['Indie_Flower'] text-lg text-black"
+                    className="list-none font-['Indie_Flower'] text-lg text-black"
                     style={{
                       columns: "2",
                       columnGap: "1rem",
@@ -497,7 +497,7 @@ function App() {
                     Crew Manifest
                   </h3>
                   <ul
-                    className="li-elem list-disc pl-6 font-['Indie_Flower'] text-lg text-black"
+                    className="list-none li-elem font-['Indie_Flower'] text-lg text-black"
                     style={{
                       columns: "2",
                       columnGap: "1rem",
