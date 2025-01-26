@@ -21,10 +21,9 @@ function App() {
   // For tabbing between preview pages
   const [activePageIndex, setActivePageIndex] = useState(0);
 
-  // We’ll split body text into pages. Each item in pages[] is the chunk for that page.
+  // We'll split body text into multiple pages. Each item in pages[] is a chunk.
   const [pages, setPages] = useState<string[]>([]);
 
-  // Ship logos
   const shipLogos: Record<string, string> = {
     audacious: "/USN_Log/ships/audacious.png",
     odin: "/USN_Log/ships/odin.png",
@@ -32,9 +31,9 @@ function App() {
     thor: "/USN_Log/ships/thor.png",
   };
 
-  // -----------------------------------------------
-  // 1) Basic localStorage loading/saving
-  // -----------------------------------------------
+  // -----------------------------------
+  // 1) Load from localStorage on mount
+  // -----------------------------------
   useEffect(() => {
     const savedTitle = localStorage.getItem("title");
     const savedBody = localStorage.getItem("body");
@@ -55,7 +54,7 @@ function App() {
     if (savedSubtitle) setSubtitle(savedSubtitle);
   }, []);
 
-  // Debounce function
+  // Debounce: we won't re-save to localStorage on every keystroke
   const debounce = (func: Function, delay: number) => {
     let timeoutId: NodeJS.Timeout;
     return (...args: any[]) => {
@@ -64,6 +63,7 @@ function App() {
     };
   };
 
+  // Save to localStorage whenever relevant fields change
   useEffect(() => {
     const saveToLocalStorage = () => {
       localStorage.setItem("title", title);
@@ -79,9 +79,9 @@ function App() {
     debouncedSave();
   }, [title, body, signature, events, crew, gold, doubloons, subtitle]);
 
-  // -----------------------------------------------
-  // 2) Splitting text: naive approach by lines & chars
-  // -----------------------------------------------
+  // -----------------------------------
+  // 2) Pagination logic (naive approach)
+  // -----------------------------------
   const MAX_LINES_PER_PAGE = 30;
   const MAX_CHARS_PER_PAGE = 1400;
 
@@ -117,7 +117,7 @@ function App() {
       lineCount++;
       charCount += line.length;
 
-      // If a single line alone is huge, we handle it in chunks
+      // If a single line alone is huge, chunk it
       if (line.length > MAX_CHARS_PER_PAGE) {
         let remainingText = line;
         while (remainingText.length > 0) {
@@ -125,7 +125,7 @@ function App() {
           pagesArr.push(chunk);
           remainingText = remainingText.slice(MAX_CHARS_PER_PAGE);
         }
-        // Reset after forcing out chunks
+        // Reset
         currentPage = "";
         lineCount = 0;
         charCount = 0;
@@ -139,79 +139,107 @@ function App() {
     return pagesArr;
   }
 
-  // Build the pages whenever `body` changes
+  // Whenever 'body' changes, recalc the pages
   useEffect(() => {
     const splitted = splitTextIntoPages(body);
     setPages(splitted);
     setActivePageIndex(splitted.length - 1); // jump to last page
   }, [body]);
 
-  // -----------------------------------------------
-  // 3) PDF / Image generation
-  // -----------------------------------------------
-  const makeFileName = (pageIndex?: number) => {
+  // -----------------------------------
+  // 3) PDF & Image generation
+  // -----------------------------------
+  // For PDF, we can just show all pages in a single container (like your old single preview approach), or we can do them one by one.
+  // Let's do them one by one with 'html2pdf' as well, for demonstration.
+  const makeFileName = (pageIndex: number, ext = "png") => {
     let base = title ? title.replace(/\s+/g, "-") : "Voyage_Log";
-    if (pageIndex != null) {
-      base += `_page${pageIndex + 1}`;
+    return `${base}_page${pageIndex + 1}.${ext}`;
+  };
+
+  // Simplified PDF approach: We'll do the "one page at a time" trick as well,
+  // then combine them in a multi-page PDF if we want. Or we can do one PDF per page.
+  // For demonstration, we'll do separate PDF pages. If you want them in a single
+  // PDF, we can revert to a multi-page container approach.
+  const generatePDF = async () => {
+    const originalActive = activePageIndex;
+
+    for (let i = 0; i < pages.length; i++) {
+      // 1) Switch to page i
+      setActivePageIndex(i);
+      // 2) Wait a tick for React to finish
+      await new Promise((r) => setTimeout(r, 100));
+
+      // 3) Grab the visible page
+      const pageEl = document.getElementById("visible-page");
+      if (!pageEl) continue;
+
+      // 4) Generate & download a single-page PDF for page i
+      const fileName = makeFileName(i, "pdf");
+      const opt = {
+        margin: 0,
+        filename: fileName,
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: {
+          scale: 2,
+          width: 816,
+          height: 1056,
+        },
+        jsPDF: {
+          unit: "px",
+          format: [816, 1056],
+          orientation: "portrait",
+        },
+      };
+
+      await html2pdf().set(opt).from(pageEl).save();
     }
-    return base + ".png";
+
+    // Restore
+    setActivePageIndex(originalActive);
   };
 
-  const generatePDF = () => {
-    // *** We now use #print-container, which has ALL pages in normal flow. ***
-    const element = document.getElementById("print-container");
-    if (!element) return;
+  // Similarly for images, we do a page-by-page approach:
+  const generateImages = async () => {
+    const originalActive = activePageIndex;
 
-    const opt = {
-      margin: 0,
-      filename: title ? title.replace(/\s+/g, "-") + ".pdf" : "Voyage_Log.pdf",
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: {
-        scale: 2,
-        width: 816,
-        height: 1056,
-      },
-      jsPDF: {
-        unit: "px",
-        format: [816, 1056],
-        orientation: "portrait",
-      },
-      pagebreak: { mode: ["avoid-all", "css"] },
-    };
+    for (let i = 0; i < pages.length; i++) {
+      // 1) Switch to page i
+      setActivePageIndex(i);
+      // 2) Wait a tick
+      await new Promise((r) => setTimeout(r, 100));
 
-    html2pdf().set(opt).from(element).save();
-  };
+      // 3) Use 'visible-page'
+      const pageEl = document.getElementById("visible-page");
+      if (!pageEl) continue;
 
-  const generateImage = async () => {
-    // *** Similarly, we target #print-container for images. ***
-    const pageElements = document.querySelectorAll(
-      "#print-container .page-preview"
-    );
-    if (!pageElements.length) return;
-
-    for (let i = 0; i < pageElements.length; i++) {
-      const pageEl = pageElements[i] as HTMLElement;
-      // Give images some crossOrigin if needed
       const canvas = await html2canvas(pageEl, { scale: 2, useCORS: true });
       canvas.toBlob((blob) => {
         if (blob) {
           const url = URL.createObjectURL(blob);
           const a = document.createElement("a");
           a.href = url;
-          a.download = makeFileName(i);
+          a.download = makeFileName(i, "png");
           a.click();
           URL.revokeObjectURL(url);
         }
       }, "image/png");
     }
+
+    // 4) Restore
+    setActivePageIndex(originalActive);
   };
 
-  // -----------------------------------------------
-  // 4) UI logic & “hidden container” approach
-  // -----------------------------------------------
+  // -----------------------------------
+  // 4) UI logic
+  // -----------------------------------
   const loadTestingData = () => {
     setTitle("Test Title");
-    setBody(`Lorem ipsum... (some big text to force multi-page)`);
+    setBody(
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.\n\n" +
+        "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n\n" +
+        "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.\n\n" +
+        "Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet."
+    );
     setSignature("Capt. Test");
     setEvents("Event 1\nEvent 2\nEvent 3");
     setCrew("Crew Member 1\nCrew Member 2\nCrew Member 3");
@@ -245,45 +273,48 @@ function App() {
   };
 
   const copyToClipboard = () => {
-    const text = formatDiscordMessage();
-    navigator.clipboard.writeText(text);
+    navigator.clipboard.writeText(formatDiscordMessage());
     alert("Copied to clipboard!");
   };
 
   const calculateTitleSize = (text: string) => {
-    // Simplified for brevity
-    return "text-5xl";
+    return "text-5xl"; // or your original logic
   };
-
   const calculateBodySize = (text: string) => {
-    // Also simplified
-    return "text-base";
+    return "text-base"; // or your original logic
   };
 
-  // Convert multiline input to array
   const formatList = (text: string) => {
     if (!text) return [];
     return text.split("\n").filter((item) => item.trim() !== "");
   };
 
-  // The main page “template” – we’ll reuse this for both the user preview (just one page) and the hidden container (all pages).
-  const renderPage = (pageText: string, pageKey: number) => {
+  // This just returns the actual DOM of the page. For the
+  // "visible" page we add an id so we can query it easily for screenshots.
+  const renderPage = (pageText: string, idx: number, isVisible: boolean) => {
+    // If not the visible page, we can hide it with "hidden"
+    // but we only do that in the final DOM. For capturing, we rely on
+    // switching activePageIndex anyway.
+    const displayStyle = isVisible ? "block" : "none";
+
     return (
       <div
-        key={pageKey}
-        className="page-preview bg-[url('/parchment.png')] bg-cover rounded-lg pb-28 mb-8"
+        key={idx}
+        id={isVisible ? "visible-page" : undefined} // only add this ID to the active page
+        className="bg-[url('/parchment.png')] bg-cover rounded-lg pb-28 mb-8"
         style={{
           width: "816px",
           height: "1190px",
           boxShadow: "0 0 20px rgba(0,0,0,0.3)",
-          pageBreakAfter: "always",
           position: "relative",
+          display: displayStyle,
         }}
       >
+        {/* Ship Logo */}
         <img
           src={shipLogos[selectedShip]}
           alt="Ship Logo"
-          crossOrigin="anonymous" // helpful if using useCORS
+          crossOrigin="anonymous"
           className="absolute inset-0 m-auto"
           style={{
             width: "50%",
@@ -310,7 +341,7 @@ function App() {
             {pageText || "Your log entry will appear here..."}
           </div>
 
-          {/* Events / Crew */}
+          {/* Events + Crew */}
           <div
             className={`grid grid-cols-2 gap-8 ml-6 mt-4 ${
               subtitle ? "mb-6" : ""
@@ -328,17 +359,14 @@ function App() {
                   breakInside: "avoid-column",
                 }}
               >
-                {formatList(events).map((event, i) => (
-                  <li
-                    key={i}
-                    className="mb-1"
-                    style={{ breakInside: "avoid-column" }}
-                  >
-                    {event}
+                {formatList(events).map((ev, i) => (
+                  <li key={i} style={{ breakInside: "avoid-column" }}>
+                    {ev}
                   </li>
                 ))}
               </ul>
             </div>
+
             <div>
               <h3 className="font-['Satisfy'] text-2xl text-black mb-2">
                 Crew Manifest
@@ -352,11 +380,7 @@ function App() {
                 }}
               >
                 {formatList(crew).map((member, i) => (
-                  <li
-                    key={i}
-                    className="mb-1"
-                    style={{ breakInside: "avoid-column" }}
-                  >
+                  <li key={i} style={{ breakInside: "avoid-column" }}>
                     {member}
                   </li>
                 ))}
@@ -371,8 +395,8 @@ function App() {
                 <img
                   src="/USN_Log/gold.webp"
                   alt="Gold"
-                  className="w-8 h-8"
                   crossOrigin="anonymous"
+                  className="w-8 h-8"
                 />
                 <span className="font-['Indie_Flower'] text-2xl text-black">
                   {gold || "0"}
@@ -382,8 +406,8 @@ function App() {
                 <img
                   src="/USN_Log/doubloon.webp"
                   alt="Doubloons"
-                  className="w-8 h-8"
                   crossOrigin="anonymous"
+                  className="w-8 h-8"
                 />
                 <span className="font-['Indie_Flower'] text-2xl text-black">
                   {doubloons || "0"}
@@ -409,12 +433,11 @@ function App() {
     );
   };
 
-  // -----------------------------------------------
-  // 5) Render
-  // -----------------------------------------------
+  // -----------------------------------
+  // 5) The actual component markup
+  // -----------------------------------
   return (
     <div className="min-h-screen bg-[#1a1a1a] text-white">
-      {/* Header */}
       <header className="bg-[#2a2a2a] p-4 text-center flex justify-between items-center">
         <h1 className="text-3xl font-bold text-amber-500">
           SoT USN Voyage Log Generator
@@ -463,14 +486,13 @@ function App() {
               </div>
             </div>
             <div className="mt-6 flex justify-between">
-              {import.meta.env.DEV && (
-                <button
-                  onClick={loadTestingData}
-                  className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-2 px-4 rounded"
-                >
-                  Load Testing Data
-                </button>
-              )}
+              <button
+                onClick={loadTestingData}
+                className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-2 px-4 rounded"
+              >
+                Load Testing Data
+              </button>
+
               <button
                 onClick={toggleModal}
                 className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
@@ -608,11 +630,11 @@ function App() {
                 className="w-full bg-amber-500 hover:bg-amber-600 text-black font-bold py-2 px-4 rounded flex items-center justify-center gap-2"
               >
                 <Printer size={20} />
-                Generate PDF
+                Generate PDF(s)
               </button>
 
               <button
-                onClick={generateImage}
+                onClick={generateImages}
                 className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded flex items-center justify-center gap-2"
               >
                 <Printer size={20} />
@@ -636,7 +658,7 @@ function App() {
           </div>
         </div>
 
-        {/*  (A) Preview Section: Renders ONLY the active page for user display */}
+        {/* Preview Section: we render all pages, but only the active one is display:block */}
         <div className="w-1/2">
           {pages.length > 1 && (
             <div className="flex gap-2 mb-2">
@@ -656,22 +678,11 @@ function App() {
             </div>
           )}
 
-          {/* Show just the currently active page in the “preview” */}
-          {pages[activePageIndex] &&
-            renderPage(pages[activePageIndex], activePageIndex)}
+          {/* Render all pages, but only active is visible. No hidden container needed. */}
+          {pages.map((pageText, idx) =>
+            renderPage(pageText, idx, idx === activePageIndex)
+          )}
         </div>
-      </div>
-
-      {/* (B) Hidden Container: Renders ALL pages stacked. We use this for PDF + images. */}
-      <div
-        id="print-container"
-        style={{
-          visibility: "hidden",
-          height: 0,
-          overflow: "hidden",
-        }}
-      >
-        {pages.map((pageText, idx) => renderPage(pageText, idx))}
       </div>
 
       {/* Copy Modal */}
