@@ -295,12 +295,12 @@ function App() {
               <label className="block text-sm font-medium mb-2">
                 Signature
               </label>
-              <input
-                type="text"
+              <textarea
                 value={signature}
                 onChange={(e) => setSignature(e.target.value)}
                 className="w-full p-2 bg-[#3a3a3a] rounded border border-gray-600 text-white"
-                placeholder="Your title and name..."
+                rows="4"
+                cols="50"
               />
             </div>
 
@@ -335,7 +335,7 @@ function App() {
         <div className="w-1/2">
           <div
             id="preview"
-            className="bg-[url('/parchment.png')] bg-cover rounded-lg relative pb-32"
+            className="bg-[url('/parchment.png')] bg-cover rounded-lg relative pb-28"
             style={{
               width: "816px",
               height: "1190px",
@@ -373,7 +373,7 @@ function App() {
               </div>
 
               {/* Events and Crew Section */}
-              <div className="grid grid-cols-2 gap-8 ml-6 mt-4 mb-8">
+              <div className="grid grid-cols-2 gap-8 ml-6 mt-4">
                 <div>
                   <h3 className="font-['Satisfy'] text-2xl text-black mb-2">
                     Notable Events
@@ -436,7 +436,8 @@ function App() {
                 </div>
 
                 <div
-                  className={`font-['Dancing_Script'] text-4xl text-black font-bold`}
+                  className={`font-['Dancing_Script'] absolute right-16
+                    bottom-0 text-5xl text-black font-bold whitespace-pre-wrap`}
                   style={{
                     transform: "rotate(-4deg)",
                     textShadow: "1px 1px 2px rgba(0,0,0,0.1)",
