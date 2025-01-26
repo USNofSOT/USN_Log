@@ -19,6 +19,7 @@ function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [titleFont, setTitleFont] = useState("Satisfy");
   const [bodyFont, setBodyFont] = useState("Indie_Flower");
+  const [subtitle, setSubtitle] = useState("");
 
   const shipLogos = {
     audacious: "/USN_Log/ships/audacious.png",
@@ -304,6 +305,17 @@ function App() {
               />
             </div>
 
+            <div>
+              <label className="block text-sm font-medium mb-2">Subtitle</label>
+              <textarea
+                value={subtitle}
+                onChange={(e) => setSubtitle(e.target.value)}
+                className="w-full p-2 bg-[#3a3a3a] rounded border border-gray-600 text-white"
+                rows="2"
+                placeholder="Enter rank or custom subtitle..."
+              />
+            </div>
+
             <div className="space-y-4">
               <button
                 onClick={generatePDF}
@@ -373,7 +385,11 @@ function App() {
               </div>
 
               {/* Events and Crew Section */}
-              <div className="grid grid-cols-2 gap-8 ml-6 mt-4">
+              <div
+                className={`grid grid-cols-2 gap-8 ml-6 mt-4 ${
+                  subtitle ? "mb-6" : ""
+                }`}
+              >
                 <div>
                   <h3 className="font-['Satisfy'] text-2xl text-black mb-2">
                     Notable Events
@@ -444,6 +460,9 @@ function App() {
                   }}
                 >
                   {signature || "Your Signature"}
+                  {subtitle && (
+                    <div className="text-3xl mt-2 text-right">{subtitle}</div>
+                  )}
                 </div>
               </div>
             </div>
