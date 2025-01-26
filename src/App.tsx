@@ -84,6 +84,8 @@ function App() {
   // -----------------------------------
   const MAX_LINES_PER_PAGE = 30;
   const MAX_CHARS_PER_PAGE = 1400;
+  const EXTRA_LINES_NON_LAST = 14;
+  const EXTRA_CHARS_NON_LAST = 500;
 
   function splitTextIntoPages(longText: string): string[] {
     if (!longText) return [""];
@@ -95,11 +97,18 @@ function App() {
     let charCount = 0;
 
     for (const line of lines) {
+      // Calculate max lines/chars for current page
+      const isLastPage =
+        currentPage === "" && lines.indexOf(line) === lines.length - 1;
+      const maxLines = isLastPage
+        ? MAX_LINES_PER_PAGE
+        : MAX_LINES_PER_PAGE + EXTRA_LINES_NON_LAST;
+      const maxChars = isLastPage
+        ? MAX_CHARS_PER_PAGE
+        : MAX_CHARS_PER_PAGE + EXTRA_CHARS_NON_LAST;
+
       // If we exceed lines or chars, push currentPage and reset
-      if (
-        lineCount >= MAX_LINES_PER_PAGE ||
-        charCount + line.length > MAX_CHARS_PER_PAGE
-      ) {
+      if (lineCount >= maxLines || charCount + line.length > maxChars) {
         if (currentPage) {
           pagesArr.push(currentPage);
           currentPage = "";
@@ -118,12 +127,12 @@ function App() {
       charCount += line.length;
 
       // If a single line alone is huge, chunk it
-      if (line.length > MAX_CHARS_PER_PAGE) {
+      if (line.length > maxChars) {
         let remainingText = line;
         while (remainingText.length > 0) {
-          const chunk = remainingText.slice(0, MAX_CHARS_PER_PAGE);
+          const chunk = remainingText.slice(0, maxChars);
           pagesArr.push(chunk);
-          remainingText = remainingText.slice(MAX_CHARS_PER_PAGE);
+          remainingText = remainingText.slice(maxChars);
         }
         // Reset
         currentPage = "";
@@ -292,15 +301,13 @@ function App() {
   // This just returns the actual DOM of the page. For the
   // "visible" page we add an id so we can query it easily for screenshots.
   const renderPage = (pageText: string, idx: number, isVisible: boolean) => {
-    // If not the visible page, we can hide it with "hidden"
-    // but we only do that in the final DOM. For capturing, we rely on
-    // switching activePageIndex anyway.
     const displayStyle = isVisible ? "block" : "none";
+    const isLastPage = idx === pages.length - 1;
 
     return (
       <div
         key={idx}
-        id={isVisible ? "visible-page" : undefined} // only add this ID to the active page
+        id={isVisible ? "visible-page" : undefined}
         className="bg-[url('/parchment.png')] bg-cover rounded-lg pb-28 mb-8"
         style={{
           width: "816px",
@@ -341,93 +348,98 @@ function App() {
             {pageText || "Your log entry will appear here..."}
           </div>
 
-          {/* Events + Crew */}
-          <div
-            className={`grid grid-cols-2 gap-8 ml-6 mt-4 ${
-              subtitle ? "mb-6" : ""
-            }`}
-          >
-            <div>
-              <h3 className="font-['Satisfy'] text-2xl text-black mb-2">
-                Notable Events
-              </h3>
-              <ul
-                className="list-none font-['Indie_Flower'] text-lg text-black"
-                style={{
-                  columns: "2",
-                  columnGap: "1rem",
-                  breakInside: "avoid-column",
-                }}
+          {/* Only render these on the last page */}
+          {isLastPage && (
+            <>
+              {/* Events + Crew */}
+              <div
+                className={`grid grid-cols-2 gap-8 ml-6 mt-4 ${
+                  subtitle ? "mb-6" : ""
+                }`}
               >
-                {formatList(events).map((ev, i) => (
-                  <li key={i} style={{ breakInside: "avoid-column" }}>
-                    {ev}
-                  </li>
-                ))}
-              </ul>
-            </div>
+                <div>
+                  <h3 className="font-['Satisfy'] text-2xl text-black mb-2">
+                    Notable Events
+                  </h3>
+                  <ul
+                    className="list-none font-['Indie_Flower'] text-lg text-black"
+                    style={{
+                      columns: "2",
+                      columnGap: "1rem",
+                      breakInside: "avoid-column",
+                    }}
+                  >
+                    {formatList(events).map((ev, i) => (
+                      <li key={i} style={{ breakInside: "avoid-column" }}>
+                        {ev}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
 
-            <div>
-              <h3 className="font-['Satisfy'] text-2xl text-black mb-2">
-                Crew Manifest
-              </h3>
-              <ul
-                className="list-none font-['Indie_Flower'] text-lg text-black"
-                style={{
-                  columns: "2",
-                  columnGap: "1rem",
-                  breakInside: "avoid-column",
-                }}
-              >
-                {formatList(crew).map((member, i) => (
-                  <li key={i} style={{ breakInside: "avoid-column" }}>
-                    {member}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-
-          {/* Gold + Doubloons + Signature */}
-          <div className="flex justify-between items-end">
-            <div className="flex gap-8">
-              <div className="flex pl-4 items-center gap-2">
-                <img
-                  src="/USN_Log/gold.webp"
-                  alt="Gold"
-                  crossOrigin="anonymous"
-                  className="w-8 h-8"
-                />
-                <span className="font-['Indie_Flower'] text-2xl text-black">
-                  {gold || "0"}
-                </span>
+                <div>
+                  <h3 className="font-['Satisfy'] text-2xl text-black mb-2">
+                    Crew Manifest
+                  </h3>
+                  <ul
+                    className="list-none font-['Indie_Flower'] text-lg text-black"
+                    style={{
+                      columns: "2",
+                      columnGap: "1rem",
+                      breakInside: "avoid-column",
+                    }}
+                  >
+                    {formatList(crew).map((member, i) => (
+                      <li key={i} style={{ breakInside: "avoid-column" }}>
+                        {member}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <img
-                  src="/USN_Log/doubloon.webp"
-                  alt="Doubloons"
-                  crossOrigin="anonymous"
-                  className="w-8 h-8"
-                />
-                <span className="font-['Indie_Flower'] text-2xl text-black">
-                  {doubloons || "0"}
-                </span>
-              </div>
-            </div>
 
-            <div
-              className="font-['Dancing_Script'] absolute right-16 bottom-0 text-5xl text-black font-bold whitespace-pre-wrap"
-              style={{
-                transform: "rotate(-4deg)",
-                textShadow: "1px 1px 2px rgba(0,0,0,0.1)",
-              }}
-            >
-              {signature || "Your Signature"}
-              {subtitle && (
-                <div className="text-3xl mt-2 text-right">{subtitle}</div>
-              )}
-            </div>
-          </div>
+              {/* Gold + Doubloons + Signature */}
+              <div className="flex justify-between items-end">
+                <div className="flex gap-8">
+                  <div className="flex pl-4 items-center gap-2">
+                    <img
+                      src="/USN_Log/gold.webp"
+                      alt="Gold"
+                      crossOrigin="anonymous"
+                      className="w-8 h-8"
+                    />
+                    <span className="font-['Indie_Flower'] text-2xl text-black">
+                      {gold || "0"}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <img
+                      src="/USN_Log/doubloon.webp"
+                      alt="Doubloons"
+                      crossOrigin="anonymous"
+                      className="w-8 h-8"
+                    />
+                    <span className="font-['Indie_Flower'] text-2xl text-black">
+                      {doubloons || "0"}
+                    </span>
+                  </div>
+                </div>
+
+                <div
+                  className="font-['Dancing_Script'] absolute right-16 bottom-0 text-5xl text-black font-bold whitespace-pre-wrap"
+                  style={{
+                    transform: "rotate(-4deg)",
+                    textShadow: "1px 1px 2px rgba(0,0,0,0.1)",
+                  }}
+                >
+                  {signature || "Your Signature"}
+                  {subtitle && (
+                    <div className="text-3xl mt-2 text-right">{subtitle}</div>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
     );
