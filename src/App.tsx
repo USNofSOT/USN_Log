@@ -51,9 +51,9 @@ function App() {
   const calculateTitleSize = (text: string) => {
     if (!text) return "text-7xl";
     if (text.length <= 20) return "text-6xl";
-    if (text.length <= 30) return "text-5xl";
-    if (text.length <= 40) return "text-4xl";
-    return "text-3xl";
+    if (text.length <= 30) return "text-6xl";
+    if (text.length <= 40) return "text-5xl";
+    return "text-5xl";
   };
 
   const calculateBodySize = (text: string) => {
