@@ -331,7 +331,7 @@ function App() {
               />
             </div>
 
-            <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
               <button
                 onClick={generatePDF}
                 className="w-full bg-amber-500 hover:bg-amber-600 text-black font-bold py-2 px-4 rounded flex items-center justify-center gap-2"
