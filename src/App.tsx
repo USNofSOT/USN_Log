@@ -184,6 +184,7 @@ function App() {
     setTitle("");
     setBody("");
     setSignature("");
+    setSubtitle("");
     setEvents("");
     setCrew("");
     setGold("");
