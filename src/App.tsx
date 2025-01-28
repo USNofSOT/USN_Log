@@ -4,57 +4,86 @@ import html2pdf from "html2pdf.js";
 import html2canvas from "html2canvas";
 
 function App() {
+  // -----------------------------------
+  // 0) State for "mode" + existing fields
+  // -----------------------------------
+  const [mode, setMode] = useState<"patrol" | "skirmish">("patrol");
+
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [signature, setSignature] = useState("");
+  const [subtitle, setSubtitle] = useState("");
+  const [selectedShip, setSelectedShip] = useState("audacious");
+
+  // Patrol-specific fields
   const [events, setEvents] = useState("");
   const [crew, setCrew] = useState("");
   const [gold, setGold] = useState("");
   const [doubloons, setDoubloons] = useState("");
-  const [selectedShip, setSelectedShip] = useState("audacious");
+
+  // Skirmish-specific fields
+  const [ourTeam, setOurTeam] = useState<"Athena" | "Reaper">("Athena");
+  // We'll store multiple "dives" in an array
+  const [dives, setDives] = useState<
+    {
+      ourTeam: "Athena" | "Reaper";
+      enemyTeam: "Athena" | "Reaper";
+      outcome: "win" | "loss";
+      notes: string;
+    }[]
+  >([]);
+
+  // UI state
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCopyModalOpen, setIsCopyModalOpen] = useState(false);
+
+  // Font choices
   const [titleFont, setTitleFont] = useState("Satisfy");
   const [bodyFont, setBodyFont] = useState("Indie_Flower");
-  const [subtitle, setSubtitle] = useState("");
-  const [isCopyModalOpen, setIsCopyModalOpen] = useState(false);
 
   // For tabbing between preview pages
   const [activePageIndex, setActivePageIndex] = useState(0);
 
-  // We'll split body text into multiple pages. Each item in pages[] is a chunk.
+  // We'll split body text into multiple pages (for the big "body" only)
   const [pages, setPages] = useState<string[]>([]);
-
-  const shipLogos: Record<string, string> = {
-    audacious: "/USN_Log/ships/audacious.png",
-    odin: "/USN_Log/ships/odin.png",
-    tyr: "/USN_Log/ships/tyr.png",
-    thor: "/USN_Log/ships/thor.png",
-  };
 
   // -----------------------------------
   // 1) Load from localStorage on mount
   // -----------------------------------
   useEffect(() => {
+    const savedMode = localStorage.getItem("mode");
+    if (savedMode) setMode(savedMode as "patrol" | "skirmish");
+
     const savedTitle = localStorage.getItem("title");
     const savedBody = localStorage.getItem("body");
     const savedSignature = localStorage.getItem("signature");
+    const savedSubtitle = localStorage.getItem("subtitle");
     const savedEvents = localStorage.getItem("events");
     const savedCrew = localStorage.getItem("crew");
     const savedGold = localStorage.getItem("gold");
     const savedDoubloons = localStorage.getItem("doubloons");
-    const savedSubtitle = localStorage.getItem("subtitle");
+    const savedOurTeam = localStorage.getItem("ourTeam");
+    const savedDives = localStorage.getItem("dives");
+    const savedSelectedShip = localStorage.getItem("selectedShip");
+    const savedTitleFont = localStorage.getItem("titleFont");
+    const savedBodyFont = localStorage.getItem("bodyFont");
 
     if (savedTitle) setTitle(savedTitle);
     if (savedBody) setBody(savedBody);
     if (savedSignature) setSignature(savedSignature);
+    if (savedSubtitle) setSubtitle(savedSubtitle);
     if (savedEvents) setEvents(savedEvents);
     if (savedCrew) setCrew(savedCrew);
     if (savedGold) setGold(savedGold);
     if (savedDoubloons) setDoubloons(savedDoubloons);
-    if (savedSubtitle) setSubtitle(savedSubtitle);
+    if (savedOurTeam) setOurTeam(savedOurTeam as "Athena" | "Reaper");
+    if (savedDives) setDives(JSON.parse(savedDives));
+    if (savedSelectedShip) setSelectedShip(savedSelectedShip);
+    if (savedTitleFont) setTitleFont(savedTitleFont);
+    if (savedBodyFont) setBodyFont(savedBodyFont);
   }, []);
 
-  // Debounce: we won't re-save to localStorage on every keystroke
+  // Helper: Debounce calls to localStorage
   const debounce = (func: Function, delay: number) => {
     let timeoutId: NodeJS.Timeout;
     return (...args: any[]) => {
@@ -63,29 +92,52 @@ function App() {
     };
   };
 
-  // Save to localStorage whenever relevant fields change
+  // -----------------------------------
+  // 2) Save to localStorage whenever relevant fields change
+  // -----------------------------------
   useEffect(() => {
     const saveToLocalStorage = () => {
+      localStorage.setItem("mode", mode);
       localStorage.setItem("title", title);
       localStorage.setItem("body", body);
       localStorage.setItem("signature", signature);
+      localStorage.setItem("subtitle", subtitle);
       localStorage.setItem("events", events);
       localStorage.setItem("crew", crew);
       localStorage.setItem("gold", gold);
       localStorage.setItem("doubloons", doubloons);
-      localStorage.setItem("subtitle", subtitle);
+      localStorage.setItem("ourTeam", ourTeam);
+      localStorage.setItem("dives", JSON.stringify(dives));
+      localStorage.setItem("selectedShip", selectedShip);
+      localStorage.setItem("titleFont", titleFont);
+      localStorage.setItem("bodyFont", bodyFont);
     };
     const debouncedSave = debounce(saveToLocalStorage, 500);
     debouncedSave();
-  }, [title, body, signature, events, crew, gold, doubloons, subtitle]);
+  }, [
+    mode,
+    title,
+    body,
+    signature,
+    subtitle,
+    events,
+    crew,
+    gold,
+    doubloons,
+    ourTeam,
+    dives,
+    selectedShip,
+    titleFont,
+    bodyFont,
+  ]);
 
   // -----------------------------------
-  // 2) Pagination logic based on writing area height
+  // 3) Pagination logic for the 'body' text
   // -----------------------------------
   const WRITING_AREA_HEIGHT = 982; // pixels
-  const LINE_HEIGHT = 24; // approximate line height in pixels
+  const LINE_HEIGHT = 24; // approximate line height
   const LINES_PER_PAGE = Math.floor(WRITING_AREA_HEIGHT / LINE_HEIGHT);
-  const CHARS_PER_LINE = 70; // approximate chars that fit per line
+  const CHARS_PER_LINE = 70; // approx chars per line
   const CHARS_PER_PAGE = LINES_PER_PAGE * CHARS_PER_LINE;
 
   function splitTextIntoPages(longText: string): string[] {
@@ -97,28 +149,28 @@ function App() {
     let currentHeight = 0;
 
     for (const line of lines) {
-      // Calculate approximate height this line will take
+      // Approx how many lines this single text line occupies
       const lineLength = line.length;
       const wrappedLines = Math.ceil(lineLength / CHARS_PER_LINE);
-      const lineHeight = wrappedLines * LINE_HEIGHT;
+      const linePixelHeight = wrappedLines * LINE_HEIGHT;
 
-      // Check if adding this line would overflow the writing area
-      if (currentHeight + lineHeight > WRITING_AREA_HEIGHT) {
-        // Current page is full, push it and start new page
+      // Check if adding line overflows
+      if (currentHeight + linePixelHeight > WRITING_AREA_HEIGHT) {
+        // Push current page
         pagesArr.push(currentPage);
         currentPage = line;
-        currentHeight = lineHeight;
+        currentHeight = linePixelHeight;
       } else {
         // Add line to current page
         if (currentPage) {
           currentPage += "\n";
-          currentHeight += LINE_HEIGHT; // Account for newline
+          currentHeight += LINE_HEIGHT; // newline overhead
         }
         currentPage += line;
-        currentHeight += lineHeight;
+        currentHeight += linePixelHeight;
       }
 
-      // Handle extremely long single lines by forcing page breaks
+      // If line is extremely long
       if (lineLength > CHARS_PER_PAGE) {
         let remainingText = line;
         while (remainingText.length > CHARS_PER_PAGE) {
@@ -132,7 +184,6 @@ function App() {
       }
     }
 
-    // Don't forget the last page
     if (currentPage) {
       pagesArr.push(currentPage);
     }
@@ -140,7 +191,7 @@ function App() {
     return pagesArr;
   }
 
-  // Whenever 'body' changes, recalc the pages
+  // Whenever 'body' changes, recalc pages
   useEffect(() => {
     const splitted = splitTextIntoPages(body);
     setPages(splitted);
@@ -148,33 +199,22 @@ function App() {
   }, [body]);
 
   // -----------------------------------
-  // 3) PDF & Image generation
+  // 4) PDF & Image generation
   // -----------------------------------
-  // For PDF, we can just show all pages in a single container (like your old single preview approach), or we can do them one by one.
-  // Let's do them one by one with 'html2pdf' as well, for demonstration.
   const makeFileName = (pageIndex: number, ext = "png") => {
     let base = title ? title.replace(/\s+/g, "-") : "Voyage_Log";
     return `${base}_page${pageIndex + 1}.${ext}`;
   };
 
-  // Simplified PDF approach: We'll do the "one page at a time" trick as well,
-  // then combine them in a multi-page PDF if we want. Or we can do one PDF per page.
-  // For demonstration, we'll do separate PDF pages. If you want them in a single
-  // PDF, we can revert to a multi-page container approach.
   const generatePDF = async () => {
     const originalActive = activePageIndex;
 
     for (let i = 0; i < pages.length; i++) {
-      // 1) Switch to page i
       setActivePageIndex(i);
-      // 2) Wait a tick for React to finish
       await new Promise((r) => setTimeout(r, 100));
-
-      // 3) Grab the visible page
       const pageEl = document.getElementById("visible-page");
       if (!pageEl) continue;
 
-      // 4) Generate & download a single-page PDF for page i
       const fileName = makeFileName(i, "pdf");
       const opt = {
         margin: 0,
@@ -191,25 +231,18 @@ function App() {
           orientation: "portrait",
         },
       };
-
       await html2pdf().set(opt).from(pageEl).save();
     }
 
-    // Restore
     setActivePageIndex(originalActive);
   };
 
-  // Similarly for images, we do a page-by-page approach:
   const generateImages = async () => {
     const originalActive = activePageIndex;
 
     for (let i = 0; i < pages.length; i++) {
-      // 1) Switch to page i
       setActivePageIndex(i);
-      // 2) Wait a tick
       await new Promise((r) => setTimeout(r, 100));
-
-      // 3) Use 'visible-page'
       const pageEl = document.getElementById("visible-page");
       if (!pageEl) continue;
 
@@ -226,27 +259,44 @@ function App() {
       }, "image/png");
     }
 
-    // 4) Restore
     setActivePageIndex(originalActive);
   };
 
   // -----------------------------------
-  // 4) UI logic
+  // 5) Utility & UI logic
   // -----------------------------------
   const loadTestingData = () => {
-    setTitle("Test Title");
-    setBody(
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.\n\n" +
-        "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n\n" +
-        "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.\n\n" +
-        "Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet."
-    );
-    setSignature("Capt. Test");
-    setEvents("Event 1\nEvent 2\nEvent 3");
-    setCrew("Crew Member 1\nCrew Member 2\nCrew Member 3");
-    setGold("100");
-    setDoubloons("50");
-    setSubtitle("Test Subtitle");
+    if (mode === "patrol") {
+      setTitle("Test Patrol Title");
+      setBody("Sample patrol log entry...");
+      setSignature("Capt. Test");
+      setEvents("Event 1\nEvent 2\nEvent 3");
+      setCrew("Crew 1\nCrew 2\nCrew 3");
+      setGold("1000");
+      setDoubloons("300");
+      setSubtitle("Test Subtitle");
+    } else {
+      // Skirmish testing data
+      setTitle("Test Skirmish Title");
+      setBody("Skirmish details here...");
+      setSignature("Capt. Test");
+      setOurTeam("Athena");
+      setDives([
+        {
+          ourTeam: "Athena",
+          enemyTeam: "Reaper",
+          outcome: "loss",
+          notes: "Stamp Leader, they had 10 flags...",
+        },
+        {
+          ourTeam: "Athena",
+          enemyTeam: "Reaper",
+          outcome: "win",
+          notes: "Second match, big win",
+        },
+      ]);
+      setSubtitle("Skirmish Leader");
+    }
   };
 
   const resetState = () => {
@@ -258,6 +308,8 @@ function App() {
     setCrew("");
     setGold("");
     setDoubloons("");
+    setOurTeam("Athena");
+    setDives([]);
     setActivePageIndex(0);
   };
 
@@ -265,24 +317,16 @@ function App() {
     setIsModalOpen(!isModalOpen);
   };
 
-  const formatDiscordMessage = () => {
-    return `${title || "title here"}\n\n${body || "details here"}\n\nEvents:\n${
-      events || "events here"
-    }\n\n:Gold: Gold: ${gold || "0"}\n:Doubloons: Doubloons: ${
-      doubloons || "0"
-    }\n\nCrew:\n${crew || "crew names"}`;
-  };
-
   const copyToClipboard = () => {
     navigator.clipboard.writeText(formatDiscordMessage());
     alert("Copied to clipboard!");
   };
 
-  const calculateTitleSize = (text: string) => {
-    return "text-5xl"; // or your original logic
+  const calculateTitleSize = (_text: string) => {
+    return "text-5xl";
   };
-  const calculateBodySize = (text: string) => {
-    return "text-base"; // or your original logic
+  const calculateBodySize = (_text: string) => {
+    return "text-base";
   };
 
   const formatList = (text: string) => {
@@ -290,8 +334,84 @@ function App() {
     return text.split("\n").filter((item) => item.trim() !== "");
   };
 
-  // This just returns the actual DOM of the page. For the
-  // "visible" page we add an id so we can query it easily for screenshots.
+  // -----------------------------------
+  // 6) Add/Update/Remove for skirmish dives (all inside same file)
+  // -----------------------------------
+  const addNewDive = () => {
+    const newDive = {
+      ourTeam,
+      enemyTeam: ourTeam === "Athena" ? "Reaper" : "Athena",
+      outcome: "win" as const,
+      notes: "",
+    };
+    setDives([...dives, newDive]);
+  };
+
+  const updateDive = (
+    index: number,
+    updated: Partial<(typeof dives)[number]>
+  ) => {
+    setDives(dives.map((d, i) => (i === index ? { ...d, ...updated } : d)));
+  };
+
+  const removeDive = (index: number) => {
+    setDives(dives.filter((_, i) => i !== index));
+  };
+
+  // -----------------------------------
+  // 7) Discord message formatting
+  // -----------------------------------
+  const formatDiscordMessage = () => {
+    if (mode === "patrol") {
+      return `${title || "Title here"}
+
+${body || "Patrol details here"}
+
+Events:
+${events || "N/A"}
+
+Gold: ${gold || "0"}
+Doubloons: ${doubloons || "0"}
+
+Crew:
+${crew || "N/A"}
+`.trim();
+    } else {
+      // Skirmish
+      const diveLines = dives
+        .map(
+          (d, i) =>
+            `${i + 1}. ${d.ourTeam} vs. ${d.enemyTeam} [${d.outcome}]${
+              d.notes ? ` - ${d.notes}` : ""
+            }`
+        )
+        .join("\n");
+
+      return `${title || "Skirmish Title"}
+
+${body || "Skirmish details here"}
+
+Team: ${ourTeam || "Athena"}
+
+Dives:
+${diveLines || "No dives yet"}
+
+Signed:
+${signature || "Your Signature"}
+`.trim();
+    }
+  };
+
+  // -----------------------------------
+  // 8) Previews: We'll do it in `renderPage()`
+  // -----------------------------------
+  const shipLogos: Record<string, string> = {
+    audacious: "/USN_Log/ships/audacious.png",
+    odin: "/USN_Log/ships/odin.png",
+    tyr: "/USN_Log/ships/tyr.png",
+    thor: "/USN_Log/ships/thor.png",
+  };
+
   const renderPage = (pageText: string, idx: number, isVisible: boolean) => {
     const displayStyle = isVisible ? "block" : "none";
     const isLastPage = idx === pages.length - 1;
@@ -343,15 +463,11 @@ function App() {
             {pageText || "Your log entry will appear here..."}
           </div>
 
-          {/* Only render these on the last page */}
-          {isLastPage && (
+          {/* On last page, we render either "Patrol" fields or "Skirmish" fields */}
+          {isLastPage && mode === "patrol" && (
             <>
-              {/* Events + Crew */}
-              <div
-                className={`grid grid-cols-2 gap-8 ml-6 mt-4 ${
-                  subtitle ? "mb-6" : ""
-                }`}
-              >
+              {/* Patrol Layout: Events + Crew */}
+              <div className="grid grid-cols-2 gap-8 ml-6 mt-4">
                 <div>
                   <h3 className="font-['Satisfy'] text-2xl text-black mb-2">
                     Notable Events
@@ -435,13 +551,67 @@ function App() {
               </div>
             </>
           )}
+
+          {isLastPage && mode === "skirmish" && (
+            <div className="p-4">
+              {/* Skirmish Layout */}
+              <h3 className="font-['Satisfy'] text-2xl text-black mb-2">
+                Skirmish Dives
+              </h3>
+              <div className="font-['Indie_Flower'] text-lg text-black leading-relaxed p-2">
+                {dives.length === 0 && (
+                  <div>No dives recorded for this skirmish.</div>
+                )}
+                {dives.map((dive, i) => (
+                  <div key={i} className="mb-3">
+                    <strong className="flex items-center gap-2">
+                      <span>
+                        {i + 1}. {dive.ourTeam}
+                      </span>
+                      <img
+                        className="w-8 h-8"
+                        src={`/USN_Log/${dive.ourTeam.toLocaleLowerCase()}.webp`}
+                        alt=""
+                      />
+                      <span>vs {dive.enemyTeam}</span>
+                      <img
+                        className="w-8 h-8"
+                        src={`/USN_Log/${dive.enemyTeam.toLocaleLowerCase()}.webp`}
+                        alt=""
+                      />
+                      <span>({dive.outcome})</span>
+                    </strong>
+                    {dive.notes && (
+                      <div className="ml-4 italic">{dive.notes}</div>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* Signature */}
+              <div className="flex justify-end items-center mt-8">
+                <div
+                  className="font-['Dancing_Script'] text-5xl text-black font-bold whitespace-pre-wrap"
+                  style={{
+                    transform: "rotate(-4deg)",
+                    textShadow: "1px 1px 2px rgba(0,0,0,0.1)",
+                  }}
+                >
+                  {signature || "Your Signature"}
+                  {subtitle && (
+                    <div className="text-3xl mt-2 text-right">{subtitle}</div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     );
   };
 
   // -----------------------------------
-  // 5) The actual component markup
+  // 9) The actual component markup
   // -----------------------------------
   return (
     <div className="min-h-screen bg-[#1a1a1a] text-white">
@@ -519,6 +689,21 @@ function App() {
         {/* Editor Section */}
         <div className="w-1/2 bg-[#2a2a2a] p-6 rounded-lg">
           <div className="space-y-4">
+            {/* Mode Toggle */}
+            <div>
+              <label className="block text-sm font-medium mb-2">Mode</label>
+              <select
+                value={mode}
+                onChange={(e) =>
+                  setMode(e.target.value as "patrol" | "skirmish")
+                }
+                className="w-full p-2 bg-[#3a3a3a] rounded border border-gray-600 text-white"
+              >
+                <option value="patrol">Patrol</option>
+                <option value="skirmish">Skirmish</option>
+              </select>
+            </div>
+
             <div>
               <label className="block text-sm font-medium mb-2">
                 Select Ship
@@ -559,57 +744,150 @@ function App() {
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                Events (One per line)
-              </label>
-              <textarea
-                value={events}
-                onChange={(e) => setEvents(e.target.value)}
-                className="w-full p-2 bg-[#3a3a3a] rounded border border-gray-600 text-white h-32"
-                placeholder="Enter events (one per line)..."
-              />
-            </div>
+            {/* Conditionally show Patrol vs Skirmish fields */}
+            {mode === "patrol" && (
+              <>
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Events (One per line)
+                  </label>
+                  <textarea
+                    value={events}
+                    onChange={(e) => setEvents(e.target.value)}
+                    className="w-full p-2 bg-[#3a3a3a] rounded border border-gray-600 text-white h-32"
+                    placeholder="Enter events (one per line)..."
+                  />
+                </div>
 
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                Crew Members (One per line)
-              </label>
-              <textarea
-                value={crew}
-                onChange={(e) => setCrew(e.target.value)}
-                className="w-full p-2 bg-[#3a3a3a] rounded border border-gray-600 text-white h-32"
-                placeholder="Enter crew members (one per line)..."
-              />
-            </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Crew Members (One per line)
+                  </label>
+                  <textarea
+                    value={crew}
+                    onChange={(e) => setCrew(e.target.value)}
+                    className="w-full p-2 bg-[#3a3a3a] rounded border border-gray-600 text-white h-32"
+                    placeholder="Enter crew members..."
+                  />
+                </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  Gold Earned
-                </label>
-                <input
-                  type="text"
-                  value={gold}
-                  onChange={(e) => setGold(e.target.value)}
-                  className="w-full p-2 bg-[#3a3a3a] rounded border border-gray-600 text-white"
-                  placeholder="Enter gold amount..."
-                />
-              </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Gold Earned
+                    </label>
+                    <input
+                      type="text"
+                      value={gold}
+                      onChange={(e) => setGold(e.target.value)}
+                      className="w-full p-2 bg-[#3a3a3a] rounded border border-gray-600 text-white"
+                      placeholder="Enter gold amount..."
+                    />
+                  </div>
 
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  Doubloons Earned
-                </label>
-                <input
-                  type="text"
-                  value={doubloons}
-                  onChange={(e) => setDoubloons(e.target.value)}
-                  className="w-full p-2 bg-[#3a3a3a] rounded border border-gray-600 text-white"
-                  placeholder="Enter doubloons amount..."
-                />
-              </div>
-            </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Doubloons Earned
+                    </label>
+                    <input
+                      type="text"
+                      value={doubloons}
+                      onChange={(e) => setDoubloons(e.target.value)}
+                      className="w-full p-2 bg-[#3a3a3a] rounded border border-gray-600 text-white"
+                      placeholder="Enter doubloons amount..."
+                    />
+                  </div>
+                </div>
+              </>
+            )}
+
+            {mode === "skirmish" && (
+              <>
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Your Team
+                  </label>
+                  <select
+                    value={ourTeam}
+                    onChange={(e) =>
+                      setOurTeam(e.target.value as "Athena" | "Reaper")
+                    }
+                    className="w-full p-2 bg-[#3a3a3a] rounded border border-gray-600 text-white"
+                  >
+                    <option value="Athena">Athena</option>
+                    <option value="Reaper">Reaper</option>
+                  </select>
+                </div>
+
+                <div className="border border-gray-500 p-2 mt-2">
+                  <h2 className="text-lg font-bold mb-2">Skirmish Dives</h2>
+                  {dives.map((dive, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center gap-2 mb-2 text-sm"
+                    >
+                      <select
+                        value={dive.ourTeam}
+                        onChange={(e) =>
+                          updateDive(index, {
+                            ourTeam: e.target.value as "Athena" | "Reaper",
+                          })
+                        }
+                        className="bg-[#3a3a3a] rounded border border-gray-600 text-white px-1"
+                      >
+                        <option value="Athena">Athena</option>
+                        <option value="Reaper">Reaper</option>
+                      </select>
+                      <span>vs.</span>
+                      <select
+                        value={dive.enemyTeam}
+                        onChange={(e) =>
+                          updateDive(index, {
+                            enemyTeam: e.target.value as "Athena" | "Reaper",
+                          })
+                        }
+                        className="bg-[#3a3a3a] rounded border border-gray-600 text-white px-1"
+                      >
+                        <option value="Athena">Athena</option>
+                        <option value="Reaper">Reaper</option>
+                      </select>
+                      <select
+                        value={dive.outcome}
+                        onChange={(e) =>
+                          updateDive(index, {
+                            outcome: e.target.value as "win" | "loss",
+                          })
+                        }
+                        className="bg-[#3a3a3a] rounded border border-gray-600 text-white px-1"
+                      >
+                        <option value="win">win</option>
+                        <option value="loss">loss</option>
+                      </select>
+                      <input
+                        className="flex-grow bg-[#3a3a3a] rounded border border-gray-600 text-white px-1"
+                        placeholder="Notes..."
+                        value={dive.notes}
+                        onChange={(e) =>
+                          updateDive(index, { notes: e.target.value })
+                        }
+                      />
+                      <button
+                        onClick={() => removeDive(index)}
+                        className="text-red-400 text-xs px-2"
+                      >
+                        X
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    onClick={addNewDive}
+                    className="mt-2 bg-green-700 hover:bg-green-600 text-white px-2 py-1 rounded text-sm"
+                  >
+                    + Add Dive
+                  </button>
+                </div>
+              </>
+            )}
 
             <div>
               <label className="block text-sm font-medium mb-2">
@@ -619,7 +897,7 @@ function App() {
                 value={signature}
                 onChange={(e) => setSignature(e.target.value)}
                 className="w-full p-2 bg-[#3a3a3a] rounded border border-gray-600 text-white"
-                rows={4}
+                rows={2}
               />
             </div>
 
@@ -668,7 +946,7 @@ function App() {
           </div>
         </div>
 
-        {/* Preview Section: we render all pages, but only the active one is display:block */}
+        {/* Preview Section */}
         <div className="w-1/2">
           {pages.length > 1 && (
             <div className="flex gap-2 mb-2">
@@ -688,7 +966,6 @@ function App() {
             </div>
           )}
 
-          {/* Render all pages, but only active is visible. No hidden container needed. */}
           {pages.map((pageText, idx) =>
             renderPage(pageText, idx, idx === activePageIndex)
           )}
