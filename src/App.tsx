@@ -553,39 +553,45 @@ ${signature || "Your Signature"}
           )}
 
           {isLastPage && mode === "skirmish" && (
-            <div className="p-4">
+            <div className="p-2">
               {/* Skirmish Layout */}
               <h3 className="font-['Satisfy'] text-2xl text-black mb-2">
                 Skirmish Dives
               </h3>
-              <div className="font-['Indie_Flower'] text-lg text-black leading-relaxed p-2">
+              <div className="font-['Indie_Flower'] text-xl text-black leading-relaxed p-2">
                 {dives.length === 0 && (
                   <div>No dives recorded for this skirmish.</div>
                 )}
-                {dives.map((dive, i) => (
-                  <div key={i} className="mb-3">
-                    <strong className="flex items-center gap-2">
-                      <span>
-                        {i + 1}. {dive.ourTeam}
-                      </span>
-                      <img
-                        className="w-8 h-8"
-                        src={`/USN_Log/${dive.ourTeam.toLocaleLowerCase()}.webp`}
-                        alt=""
-                      />
-                      <span>vs {dive.enemyTeam}</span>
-                      <img
-                        className="w-8 h-8"
-                        src={`/USN_Log/${dive.enemyTeam.toLocaleLowerCase()}.webp`}
-                        alt=""
-                      />
-                      <span>({dive.outcome})</span>
-                    </strong>
-                    {dive.notes && (
-                      <div className="ml-4 italic">{dive.notes}</div>
-                    )}
-                  </div>
-                ))}
+                <div
+                  className={`grid ${
+                    dives.length > 8 ? "grid-cols-2 gap-0" : "grid-cols-1"
+                  }`}
+                >
+                  {dives.map((dive, i) => (
+                    <div key={i} className="mb-3">
+                      <strong className="flex items-center gap-2">
+                        <span>
+                          {i + 1}. {dive.ourTeam}
+                        </span>
+                        <img
+                          className="w-8 h-8"
+                          src={`/USN_Log/${dive.ourTeam.toLocaleLowerCase()}.webp`}
+                          alt=""
+                        />
+                        <span>vs {dive.enemyTeam}</span>
+                        <img
+                          className="w-8 h-8"
+                          src={`/USN_Log/${dive.enemyTeam.toLocaleLowerCase()}.webp`}
+                          alt=""
+                        />
+                        <span>({dive.outcome})</span>
+                      </strong>
+                      {dive.notes && (
+                        <div className="ml-4 italic">{dive.notes}</div>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
 
               {/* Signature */}
