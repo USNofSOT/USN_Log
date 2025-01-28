@@ -375,15 +375,21 @@ Doubloons: ${doubloons || "0"}
 
 Crew:
 ${crew || "N/A"}
+
+Signed:
+${signature || "Your Signature"}
+${subtitle ? `${subtitle}` : ""}
 `.trim();
     } else {
       // Skirmish
       const diveLines = dives
         .map(
           (d, i) =>
-            `${i + 1}. ${d.ourTeam} vs. ${d.enemyTeam} [${d.outcome}]${
-              d.notes ? ` - ${d.notes}` : ""
-            }`
+            `${i + 1}. ${d.ourTeam} ${
+              d.ourTeam === "Athena" ? ":Athena:" : ":Reaper:"
+            } vs. ${d.enemyTeam} ${
+              d.enemyTeam === "Athena" ? ":Athena:" : ":Reaper:"
+            } [${d.outcome}]${d.notes ? ` - ${d.notes}` : ""}`
         )
         .join("\n");
 
@@ -398,6 +404,7 @@ ${diveLines || "No dives yet"}
 
 Signed:
 ${signature || "Your Signature"}
+${subtitle ? `${subtitle}` : ""}
 `.trim();
     }
   };
