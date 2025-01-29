@@ -1,208 +1,65 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Printer } from "lucide-react";
 import html2pdf from "html2pdf.js";
 import html2canvas from "html2canvas";
+import { useLogState, ShipType } from "./hooks/useLogState";
 
 function App() {
-  // -----------------------------------
-  // 0) State for "mode" + existing fields
-  // -----------------------------------
-  const [mode, setMode] = useState<"patrol" | "skirmish">("patrol");
-
-  const [title, setTitle] = useState("");
-  const [body, setBody] = useState("");
-  const [signature, setSignature] = useState("");
-  const [subtitle, setSubtitle] = useState("");
-  const [selectedShip, setSelectedShip] = useState("audacious");
-
-  // Patrol-specific fields
-  const [events, setEvents] = useState("");
-  const [crew, setCrew] = useState("");
-  const [gold, setGold] = useState("");
-  const [doubloons, setDoubloons] = useState("");
-
-  // Skirmish-specific fields
-  const [ourTeam, setOurTeam] = useState<"Athena" | "Reaper">("Athena");
-  // We'll store multiple "dives" in an array
-  const [dives, setDives] = useState<
-    {
-      ourTeam: "Athena" | "Reaper";
-      enemyTeam: "Athena" | "Reaper";
-      outcome: "win" | "loss";
-      notes: string;
-    }[]
-  >([]);
-
-  // UI state
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isCopyModalOpen, setIsCopyModalOpen] = useState(false);
-
-  // Font choices
-  const [titleFont, setTitleFont] = useState("Satisfy");
-  const [bodyFont, setBodyFont] = useState("Indie_Flower");
-
-  // For tabbing between preview pages
-  const [activePageIndex, setActivePageIndex] = useState(0);
-
-  // We'll split body text into multiple pages (for the big "body" only)
-  const [pages, setPages] = useState<string[]>([]);
-
-  // -----------------------------------
-  // 1) Load from localStorage on mount
-  // -----------------------------------
-  useEffect(() => {
-    const savedMode = localStorage.getItem("mode");
-    if (savedMode) setMode(savedMode as "patrol" | "skirmish");
-
-    const savedTitle = localStorage.getItem("title");
-    const savedBody = localStorage.getItem("body");
-    const savedSignature = localStorage.getItem("signature");
-    const savedSubtitle = localStorage.getItem("subtitle");
-    const savedEvents = localStorage.getItem("events");
-    const savedCrew = localStorage.getItem("crew");
-    const savedGold = localStorage.getItem("gold");
-    const savedDoubloons = localStorage.getItem("doubloons");
-    const savedOurTeam = localStorage.getItem("ourTeam");
-    const savedDives = localStorage.getItem("dives");
-    const savedSelectedShip = localStorage.getItem("selectedShip");
-    const savedTitleFont = localStorage.getItem("titleFont");
-    const savedBodyFont = localStorage.getItem("bodyFont");
-
-    if (savedTitle) setTitle(savedTitle);
-    if (savedBody) setBody(savedBody);
-    if (savedSignature) setSignature(savedSignature);
-    if (savedSubtitle) setSubtitle(savedSubtitle);
-    if (savedEvents) setEvents(savedEvents);
-    if (savedCrew) setCrew(savedCrew);
-    if (savedGold) setGold(savedGold);
-    if (savedDoubloons) setDoubloons(savedDoubloons);
-    if (savedOurTeam) setOurTeam(savedOurTeam as "Athena" | "Reaper");
-    if (savedDives) setDives(JSON.parse(savedDives));
-    if (savedSelectedShip) setSelectedShip(savedSelectedShip);
-    if (savedTitleFont) setTitleFont(savedTitleFont);
-    if (savedBodyFont) setBodyFont(savedBodyFont);
-  }, []);
-
-  // Helper: Debounce calls to localStorage
-  const debounce = (func: Function, delay: number) => {
-    let timeoutId: NodeJS.Timeout;
-    return (...args: any[]) => {
-      if (timeoutId) clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => func(...args), delay);
-    };
-  };
-
-  // -----------------------------------
-  // 2) Save to localStorage whenever relevant fields change
-  // -----------------------------------
-  useEffect(() => {
-    const saveToLocalStorage = () => {
-      localStorage.setItem("mode", mode);
-      localStorage.setItem("title", title);
-      localStorage.setItem("body", body);
-      localStorage.setItem("signature", signature);
-      localStorage.setItem("subtitle", subtitle);
-      localStorage.setItem("events", events);
-      localStorage.setItem("crew", crew);
-      localStorage.setItem("gold", gold);
-      localStorage.setItem("doubloons", doubloons);
-      localStorage.setItem("ourTeam", ourTeam);
-      localStorage.setItem("dives", JSON.stringify(dives));
-      localStorage.setItem("selectedShip", selectedShip);
-      localStorage.setItem("titleFont", titleFont);
-      localStorage.setItem("bodyFont", bodyFont);
-    };
-    const debouncedSave = debounce(saveToLocalStorage, 500);
-    debouncedSave();
-  }, [
+  const {
+    // State
     mode,
     title,
     body,
     signature,
     subtitle,
+    selectedShip,
     events,
     crew,
     gold,
     doubloons,
     ourTeam,
     dives,
-    selectedShip,
+    isModalOpen,
+    isCopyModalOpen,
     titleFont,
     bodyFont,
-  ]);
+    activePageIndex,
+    pages,
+
+    // Setters
+    setMode,
+    setTitle,
+    setBody,
+    setSignature,
+    setSubtitle,
+    setSelectedShip,
+    setEvents,
+    setCrew,
+    setGold,
+    setDoubloons,
+    setOurTeam,
+    setDives,
+    setIsModalOpen,
+    setIsCopyModalOpen,
+    setTitleFont,
+    setBodyFont,
+    setActivePageIndex,
+
+    // Actions
+    addNewDive,
+    updateDive,
+    removeDive,
+    resetState,
+    loadTestingData,
+    formatList,
+    formatDiscordMessage,
+  } = useLogState();
 
   // -----------------------------------
-  // 3) Pagination logic for the 'body' text
-  // -----------------------------------
-  const WRITING_AREA_HEIGHT = 982; // pixels
-  const LINE_HEIGHT = 24; // approximate line height
-  const LINES_PER_PAGE = Math.floor(WRITING_AREA_HEIGHT / LINE_HEIGHT);
-  const CHARS_PER_LINE = 70; // approx chars per line
-  const CHARS_PER_PAGE = LINES_PER_PAGE * CHARS_PER_LINE;
-
-  function splitTextIntoPages(longText: string): string[] {
-    if (!longText) return [""];
-
-    const pagesArr: string[] = [];
-    const lines = longText.split("\n");
-    let currentPage = "";
-    let currentHeight = 0;
-
-    for (const line of lines) {
-      // Approx how many lines this single text line occupies
-      const lineLength = line.length;
-      const wrappedLines = Math.ceil(lineLength / CHARS_PER_LINE);
-      const linePixelHeight = wrappedLines * LINE_HEIGHT;
-
-      // Check if adding line overflows
-      if (currentHeight + linePixelHeight > WRITING_AREA_HEIGHT) {
-        // Push current page
-        pagesArr.push(currentPage);
-        currentPage = line;
-        currentHeight = linePixelHeight;
-      } else {
-        // Add line to current page
-        if (currentPage) {
-          currentPage += "\n";
-          currentHeight += LINE_HEIGHT; // newline overhead
-        }
-        currentPage += line;
-        currentHeight += linePixelHeight;
-      }
-
-      // If line is extremely long
-      if (lineLength > CHARS_PER_PAGE) {
-        let remainingText = line;
-        while (remainingText.length > CHARS_PER_PAGE) {
-          const chunk = remainingText.slice(0, CHARS_PER_PAGE);
-          pagesArr.push(chunk);
-          remainingText = remainingText.slice(CHARS_PER_PAGE);
-        }
-        currentPage = remainingText;
-        currentHeight =
-          Math.ceil(remainingText.length / CHARS_PER_LINE) * LINE_HEIGHT;
-      }
-    }
-
-    if (currentPage) {
-      pagesArr.push(currentPage);
-    }
-
-    return pagesArr;
-  }
-
-  // Whenever 'body' changes, recalc pages
-  useEffect(() => {
-    const splitted = splitTextIntoPages(body);
-    setPages(splitted);
-    setActivePageIndex(splitted.length - 1); // jump to last page
-  }, [body]);
-
-  // -----------------------------------
-  // 4) PDF & Image generation
+  // PDF & Image generation
   // -----------------------------------
   const makeFileName = (pageIndex: number, ext = "png") => {
-    let base = title ? title.replace(/\s+/g, "-") : "Voyage_Log";
+    const base = title ? title.replace(/\s+/g, "-") : "Voyage_Log";
     return `${base}_page${pageIndex + 1}.${ext}`;
   };
 
@@ -262,57 +119,6 @@ function App() {
     setActivePageIndex(originalActive);
   };
 
-  // -----------------------------------
-  // 5) Utility & UI logic
-  // -----------------------------------
-  const loadTestingData = () => {
-    if (mode === "patrol") {
-      setTitle("Test Patrol Title");
-      setBody("Sample patrol log entry...");
-      setSignature("Capt. Test");
-      setEvents("Event 1\nEvent 2\nEvent 3");
-      setCrew("Crew 1\nCrew 2\nCrew 3");
-      setGold("1000");
-      setDoubloons("300");
-      setSubtitle("Test Subtitle");
-    } else {
-      // Skirmish testing data
-      setTitle("Test Skirmish Title");
-      setBody("Skirmish details here...");
-      setSignature("Capt. Test");
-      setOurTeam("Athena");
-      setDives([
-        {
-          ourTeam: "Athena",
-          enemyTeam: "Reaper",
-          outcome: "loss",
-          notes: "Stamp Leader, they had 10 flags...",
-        },
-        {
-          ourTeam: "Athena",
-          enemyTeam: "Reaper",
-          outcome: "win",
-          notes: "Second match, big win",
-        },
-      ]);
-      setSubtitle("Skirmish Leader");
-    }
-  };
-
-  const resetState = () => {
-    setTitle("");
-    setBody("");
-    setSignature("");
-    setSubtitle("");
-    setEvents("");
-    setCrew("");
-    setGold("");
-    setDoubloons("");
-    setOurTeam("Athena");
-    setDives([]);
-    setActivePageIndex(0);
-  };
-
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
   };
@@ -322,95 +128,8 @@ function App() {
     alert("Copied to clipboard!");
   };
 
-  const calculateTitleSize = (_text: string) => {
-    return "text-5xl";
-  };
-  const calculateBodySize = (_text: string) => {
-    return "text-base";
-  };
-
-  const formatList = (text: string) => {
-    if (!text) return [];
-    return text.split("\n").filter((item) => item.trim() !== "");
-  };
-
   // -----------------------------------
-  // 6) Add/Update/Remove for skirmish dives (all inside same file)
-  // -----------------------------------
-  const addNewDive = () => {
-    const newDive = {
-      ourTeam,
-      enemyTeam: ourTeam === "Athena" ? "Reaper" : "Athena",
-      outcome: "win" as const,
-      notes: "",
-    };
-    setDives([...dives, newDive]);
-  };
-
-  const updateDive = (
-    index: number,
-    updated: Partial<(typeof dives)[number]>
-  ) => {
-    setDives(dives.map((d, i) => (i === index ? { ...d, ...updated } : d)));
-  };
-
-  const removeDive = (index: number) => {
-    setDives(dives.filter((_, i) => i !== index));
-  };
-
-  // -----------------------------------
-  // 7) Discord message formatting
-  // -----------------------------------
-  const formatDiscordMessage = () => {
-    if (mode === "patrol") {
-      return `${title || "Title here"}
-
-${body || "Patrol details here"}
-
-Events:
-${events || "N/A"}
-
-Gold: ${gold || "0"}
-Doubloons: ${doubloons || "0"}
-
-Crew:
-${crew || "N/A"}
-
-Signed:
-${signature || "Your Signature"}
-${subtitle ? `${subtitle}` : ""}
-`.trim();
-    } else {
-      // Skirmish
-      const diveLines = dives
-        .map(
-          (d, i) =>
-            `${i + 1}. ${d.ourTeam} ${
-              d.ourTeam === "Athena" ? ":Athena:" : ":Reaper:"
-            } vs. ${d.enemyTeam} ${
-              d.enemyTeam === "Athena" ? ":Athena:" : ":Reaper:"
-            } [${d.outcome}]${d.notes ? ` - ${d.notes}` : ""}`
-        )
-        .join("\n");
-
-      return `${title || "Skirmish Title"}
-
-${body || "Skirmish details here"}
-
-Team: ${ourTeam || "Athena"}
-
-Dives:
-${diveLines || "No dives yet"}
-
-Signed:
-${signature || "Your Signature"}
-${subtitle ? `${subtitle}` : ""}
-`.trim();
-    }
-  };
-
-  // -----------------------------------
-  // 8) Previews: We'll do it in `renderPage()`
+  // Ship logos and rendering
   // -----------------------------------
   const shipLogos: Record<string, string> = {
     audacious: "/USN_Log/ships/audacious.png",
@@ -455,17 +174,13 @@ ${subtitle ? `${subtitle}` : ""}
           className="p-12 h-full flex flex-col relative z-10"
         >
           <h2
-            className={`${calculateTitleSize(
-              title
-            )} text-center ml-16 mr-16 mt-12 mb-8 font-['${titleFont}'] text-black whitespace-pre-wrap`}
+            className={`text-5xl text-center ml-16 mr-16 mt-12 mb-8 font-['${titleFont}'] text-black whitespace-pre-wrap`}
           >
             {title || "Log Title"}
           </h2>
 
           <div
-            className={`font-['${bodyFont}'] ${calculateBodySize(
-              body
-            )} flex-grow whitespace-pre-wrap text-black leading-relaxed p-2`}
+            className={`font-['${bodyFont}'] text-base flex-grow whitespace-pre-wrap text-black leading-relaxed p-2`}
           >
             {pageText || "Your log entry will appear here..."}
           </div>
@@ -624,7 +339,7 @@ ${subtitle ? `${subtitle}` : ""}
   };
 
   // -----------------------------------
-  // 9) The actual component markup
+  // The actual component markup
   // -----------------------------------
   return (
     <div className="min-h-screen bg-[#1a1a1a] text-white">
@@ -723,7 +438,7 @@ ${subtitle ? `${subtitle}` : ""}
               </label>
               <select
                 value={selectedShip}
-                onChange={(e) => setSelectedShip(e.target.value)}
+                onChange={(e) => setSelectedShip(e.target.value as ShipType)}
                 className="w-full p-2 bg-[#3a3a3a] rounded border border-gray-600 text-white"
               >
                 <option value="audacious">Audacious</option>
