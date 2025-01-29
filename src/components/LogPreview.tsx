@@ -1,48 +1,26 @@
 import React from "react";
-import { ShipType } from "../hooks/useLogState";
+import { useLog } from "../context/LogContext";
 
-interface LogPreviewProps {
-  pages: string[];
-  activePageIndex: number;
-  setActivePageIndex: (index: number) => void;
-  selectedShip: ShipType;
-  title: string;
-  signature: string;
-  subtitle?: string;
-  mode: "patrol" | "skirmish";
-  events: string;
-  crew: string;
-  gold: string;
-  doubloons: string;
-  dives: Array<{
-    ourTeam: "Athena" | "Reaper";
-    enemyTeam: "Athena" | "Reaper";
-    outcome: "win" | "loss";
-    notes?: string;
-  }>;
-  titleFont: string;
-  bodyFont: string;
-  formatList: (text: string) => string[];
-}
+export const LogPreview: React.FC = () => {
+  const {
+    pages,
+    activePageIndex,
+    setActivePageIndex,
+    selectedShip,
+    title,
+    signature,
+    subtitle,
+    mode,
+    events,
+    crew,
+    gold,
+    doubloons,
+    dives,
+    titleFont,
+    bodyFont,
+    formatList,
+  } = useLog();
 
-export const LogPreview: React.FC<LogPreviewProps> = ({
-  pages,
-  activePageIndex,
-  setActivePageIndex,
-  selectedShip,
-  title,
-  signature,
-  subtitle,
-  mode,
-  events,
-  crew,
-  gold,
-  doubloons,
-  dives,
-  titleFont,
-  bodyFont,
-  formatList,
-}) => {
   const shipLogos: Record<string, string> = {
     audacious: "/USN_Log/ships/audacious.png",
     odin: "/USN_Log/ships/odin.png",

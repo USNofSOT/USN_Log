@@ -1,85 +1,42 @@
 import React from "react";
 import { Printer } from "lucide-react";
+import { useLog } from "../context/LogContext";
 import { ShipType } from "../hooks/useLogState";
 
-interface EditorProps {
-  mode: "patrol" | "skirmish";
-  setMode: (mode: "patrol" | "skirmish") => void;
-  title: string;
-  setTitle: (title: string) => void;
-  body: string;
-  setBody: (body: string) => void;
-  signature: string;
-  setSignature: (signature: string) => void;
-  subtitle: string;
-  setSubtitle: (subtitle: string) => void;
-  selectedShip: ShipType;
-  setSelectedShip: (ship: ShipType) => void;
-  events: string;
-  setEvents: (events: string) => void;
-  crew: string;
-  setCrew: (crew: string) => void;
-  gold: string;
-  setGold: (gold: string) => void;
-  doubloons: string;
-  setDoubloons: (doubloons: string) => void;
-  ourTeam: "Athena" | "Reaper";
-  setOurTeam: (team: "Athena" | "Reaper") => void;
-  dives: Array<{
-    ourTeam: "Athena" | "Reaper";
-    enemyTeam: "Athena" | "Reaper";
-    outcome: "win" | "loss";
-    notes?: string;
-  }>;
-  updateDive: (
-    index: number,
-    update: Partial<{
-      ourTeam: "Athena" | "Reaper";
-      enemyTeam: "Athena" | "Reaper";
-      outcome: "win" | "loss";
-      notes?: string;
-    }>
-  ) => void;
-  removeDive: (index: number) => void;
-  addNewDive: () => void;
-  generatePDF: () => void;
-  generateImages: () => void;
-  resetState: () => void;
-  setIsCopyModalOpen: (isOpen: boolean) => void;
-}
+export const Editor: React.FC = () => {
+  const {
+    mode,
+    setMode,
+    title,
+    setTitle,
+    body,
+    setBody,
+    signature,
+    setSignature,
+    subtitle,
+    setSubtitle,
+    selectedShip,
+    setSelectedShip,
+    events,
+    setEvents,
+    crew,
+    setCrew,
+    gold,
+    setGold,
+    doubloons,
+    setDoubloons,
+    ourTeam,
+    setOurTeam,
+    dives,
+    updateDive,
+    removeDive,
+    addNewDive,
+    generatePDF,
+    generateImages,
+    resetState,
+    setIsCopyModalOpen,
+  } = useLog();
 
-export const Editor: React.FC<EditorProps> = ({
-  mode,
-  setMode,
-  title,
-  setTitle,
-  body,
-  setBody,
-  signature,
-  setSignature,
-  subtitle,
-  setSubtitle,
-  selectedShip,
-  setSelectedShip,
-  events,
-  setEvents,
-  crew,
-  setCrew,
-  gold,
-  setGold,
-  doubloons,
-  setDoubloons,
-  ourTeam,
-  setOurTeam,
-  dives,
-  updateDive,
-  removeDive,
-  addNewDive,
-  generatePDF,
-  generateImages,
-  resetState,
-  setIsCopyModalOpen,
-}) => {
   return (
     <div className="w-1/2 bg-[#2a2a2a] p-6 rounded-lg">
       <div className="space-y-4">

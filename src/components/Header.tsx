@@ -1,10 +1,10 @@
 import React from "react";
+import { useLog } from "../context/LogContext";
 
-interface HeaderProps {
-  onSettingsClick: () => void;
-}
+export const Header: React.FC = () => {
+  const { setIsModalOpen } = useLog();
+  const toggleModal = () => setIsModalOpen(true);
 
-export const Header: React.FC<HeaderProps> = ({ onSettingsClick }) => {
   return (
     <header className="bg-[#2a2a2a] py-1 px-4 pr-8 text-center flex justify-between items-center">
       <div className="flex items-center gap-2">
@@ -14,7 +14,7 @@ export const Header: React.FC<HeaderProps> = ({ onSettingsClick }) => {
         </h1>
       </div>
       <button
-        onClick={onSettingsClick}
+        onClick={toggleModal}
         className="bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded"
       >
         Settings

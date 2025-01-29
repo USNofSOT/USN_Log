@@ -1,23 +1,20 @@
-interface SettingsModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  titleFont: string;
-  bodyFont: string;
-  onTitleFontChange: (font: string) => void;
-  onBodyFontChange: (font: string) => void;
-  onLoadTestingData: () => void;
-}
+import React from "react";
+import { useLog } from "../context/LogContext";
 
-export function SettingsModal({
-  isOpen,
-  onClose,
-  titleFont,
-  bodyFont,
-  onTitleFontChange,
-  onBodyFontChange,
-  onLoadTestingData,
-}: SettingsModalProps) {
-  if (!isOpen) return null;
+export const SettingsModal: React.FC = () => {
+  const {
+    isModalOpen,
+    setIsModalOpen,
+    titleFont,
+    bodyFont,
+    setTitleFont,
+    setBodyFont,
+    loadTestingData,
+  } = useLog();
+
+  const onClose = () => setIsModalOpen(false);
+
+  if (!isModalOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
@@ -28,7 +25,7 @@ export function SettingsModal({
             <label className="block text-sm font-medium mb-2">Title Font</label>
             <select
               value={titleFont}
-              onChange={(e) => onTitleFontChange(e.target.value)}
+              onChange={(e) => setTitleFont(e.target.value)}
               className="w-full p-2 bg-gray-700 rounded border border-gray-600 text-white"
             >
               <option value="Satisfy">Satisfy</option>
@@ -42,7 +39,7 @@ export function SettingsModal({
             </label>
             <select
               value={bodyFont}
-              onChange={(e) => onBodyFontChange(e.target.value)}
+              onChange={(e) => setBodyFont(e.target.value)}
               className="w-full p-2 bg-gray-700 rounded border border-gray-600 text-white"
             >
               <option value="Satisfy">Satisfy</option>
@@ -53,7 +50,7 @@ export function SettingsModal({
         </div>
         <div className="mt-6 flex justify-between">
           <button
-            onClick={onLoadTestingData}
+            onClick={loadTestingData}
             className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-2 px-4 rounded"
           >
             Load Testing Data
@@ -69,4 +66,4 @@ export function SettingsModal({
       </div>
     </div>
   );
-}
+};
