@@ -229,7 +229,7 @@ export const LogPreview: React.FC = () => {
   };
 
   return (
-    <div className="w-1/2">
+    <div className="w-1/2" data-testid="log-preview">
       {pages.length > 1 && (
         <div className="flex gap-2 mb-2">
           {pages.map((_, idx) => (

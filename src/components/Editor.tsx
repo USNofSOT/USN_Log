@@ -54,8 +54,14 @@ export const Editor: React.FC = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Select Ship</label>
+          <label
+            htmlFor="ship-select"
+            className="block text-sm font-medium mb-2"
+          >
+            Select Ship
+          </label>
           <select
+            id="ship-select"
             value={selectedShip}
             onChange={(e) => setSelectedShip(e.target.value as ShipType)}
             className="w-full p-2 bg-[#3a3a3a] rounded border border-gray-600 text-white"
