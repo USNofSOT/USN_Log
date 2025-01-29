@@ -10,15 +10,17 @@ function App() {
   return (
     <LogProvider>
       <div className="min-h-screen bg-[#1a1a1a] text-white">
-        <Header />
-        <SettingsModal />
-        <CopyModal />
+        <div role="banner">
+          <Header />
+        </div>
+        <SettingsModal data-testid="settings-modal" />
+        <CopyModal data-testid="copy-modal" />
 
         {/* Main Layout */}
-        <div className="container mx-auto p-4 flex gap-4">
-          <Editor />
-          <LogPreview />
-        </div>
+        <main className="container mx-auto p-4 flex gap-4">
+          <Editor data-testid="editor" />
+          <LogPreview data-testid="log-preview" />
+        </main>
       </div>
     </LogProvider>
   );
