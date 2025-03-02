@@ -264,50 +264,76 @@ export function useLogState() {
 
   // Discord message formatting
   const formatDiscordMessage = () => {
-    if (mode === "patrol") {
-      return `${title || "Title here"}
+    // Common sections that appear in both modes
+    const formatCommonSections = () => {
+      const sections = [
+        title || "Title here",
+        "",
+        body ||
+          (mode === "patrol" ? "Patrol details here" : "Skirmish details here"),
+        "",
+      ];
+      return sections.join("\n");
+    };
 
-${body || "Patrol details here"}
+    // Format the signature block that appears at the end
+    const formatSignature = () => {
+      const sections = [
+        "",
+        "Signed:",
+        signature || "Your Signature",
+        subtitle || "",
+      ].filter(Boolean);
+      return sections.join("\n");
+    };
 
-Events:
-${events || "N/A"}
+    // Format patrol-specific content
+    const formatPatrolContent = () => {
+      const sections = [
+        "Events:",
+        events || "N/A",
+        "",
+        `Gold: ${gold || "0"}`,
+        `Doubloons: ${doubloons || "0"}`,
+        "",
+        "Crew:",
+        crew || "N/A",
+      ];
+      return sections.join("\n");
+    };
 
-Gold: ${gold || "0"}
-Doubloons: ${doubloons || "0"}
+    // Format skirmish-specific content
+    const formatSkirmishContent = () => {
+      const formatTeamEmoji = (team: "Athena" | "Reaper") =>
+        `${team} ${team === "Athena" ? ":Athena:" : ":Reaper:"}`;
 
-Crew:
-${crew || "N/A"}
+      const formatDive = (dive: DiveEntry, index: number) => {
+        const vs = `${formatTeamEmoji(dive.ourTeam)} vs. ${formatTeamEmoji(
+          dive.enemyTeam
+        )}`;
+        const notes = dive.notes ? ` - ${dive.notes}` : "";
+        return `${index + 1}. ${vs} [${dive.outcome}]${notes}`;
+      };
 
-Signed:
-${signature || "Your Signature"}
-${subtitle ? `${subtitle}` : ""}
-`.trim();
-    } else {
-      const diveLines = dives
-        .map(
-          (d, i) =>
-            `${i + 1}. ${d.ourTeam} ${
-              d.ourTeam === "Athena" ? ":Athena:" : ":Reaper:"
-            } vs. ${d.enemyTeam} ${
-              d.enemyTeam === "Athena" ? ":Athena:" : ":Reaper:"
-            } [${d.outcome}]${d.notes ? ` - ${d.notes}` : ""}`
-        )
-        .join("\n");
+      const sections = [
+        `Team: ${ourTeam || "Athena"}`,
+        "",
+        "Dives:",
+        dives.length
+          ? dives.map((d, i) => formatDive(d, i)).join("\n")
+          : "No dives yet",
+      ];
+      return sections.join("\n");
+    };
 
-      return `${title || "Skirmish Title"}
+    // Combine all sections based on mode
+    const content = [
+      formatCommonSections(),
+      mode === "patrol" ? formatPatrolContent() : formatSkirmishContent(),
+      formatSignature(),
+    ].join("\n");
 
-${body || "Skirmish details here"}
-
-Team: ${ourTeam || "Athena"}
-
-Dives:
-${diveLines || "No dives yet"}
-
-Signed:
-${signature || "Your Signature"}
-${subtitle ? `${subtitle}` : ""}
-`.trim();
-    }
+    return content.trim();
   };
 
   return {
