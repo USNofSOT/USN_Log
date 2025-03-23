@@ -22,10 +22,10 @@ export const LogPreview: React.FC = () => {
   } = useLog();
 
   const shipLogos: Record<string, string> = {
-    audacious: "/USN_Log/ships/audacious.png",
+    valhalla: "/USN_Log/ships/valhalla.png",
+    fenrir: "", // todo: add fenrir logo
     odin: "/USN_Log/ships/odin.png",
     tyr: "/USN_Log/ships/tyr.png",
-    thor: "/USN_Log/ships/thor.png",
   };
 
   const renderPage = (pageText: string, idx: number, isVisible: boolean) => {
@@ -48,6 +48,9 @@ export const LogPreview: React.FC = () => {
         {/* Ship Logo */}
         <img
           src={shipLogos[selectedShip]}
+          onError={(e) => {
+            e.currentTarget.src = "/USN_Log/ships/valhalla.png";
+          }}
           alt="Ship Logo"
           crossOrigin="anonymous"
           className="absolute inset-0 m-auto"

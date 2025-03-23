@@ -8,7 +8,7 @@ type DiveEntry = {
 };
 
 export type LogMode = "patrol" | "skirmish";
-export type ShipType = "audacious" | "odin" | "tyr" | "thor";
+export type ShipType = "valhalla" | "fenrir" | "tyr" | "odin";
 
 export function useLogState() {
   // Mode and basic fields
