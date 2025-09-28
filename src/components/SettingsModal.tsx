@@ -1,6 +1,8 @@
 import React from "react";
 import { useLog } from "../context/LogContext";
 import { log_backgrounds } from "../config/log_background";
+import { log_icons } from "../config/log_icons";
+import { ShipType } from "../hooks/useLogState";
 
 export const SettingsModal: React.FC = () => {
   const {
@@ -10,6 +12,8 @@ export const SettingsModal: React.FC = () => {
     bodyFont,
     logBackground,
     setLogBackground,
+    selectedShip,
+    setSelectedShip,
     setTitleFont,
     setBodyFont,
     loadTestingData,
@@ -47,6 +51,21 @@ export const SettingsModal: React.FC = () => {
               <option value="Satisfy">Satisfy</option>
               <option value="Indie_Flower">Indie Flower</option>
               <option value="Dancing_Script">Dancing Script</option>
+            </select>
+          </div>
+          <div>
+              <label htmlFor="log-icon" className="block text-sm font-medium mb-2">
+                Log Icon
+              </label>
+            <select
+              id="log-icon"
+              value={selectedShip}
+              onChange={(e) => setSelectedShip(e.target.value as ShipType)}
+              className="w-full p-2 bg-gray-700 rounded border border-gray-600 text-white"
+            >
+              {log_icons.map(function(object, i){
+                  return <option value={object.value} key={i}>{object.name}</option>;
+              })}
             </select>
           </div>
           <div>

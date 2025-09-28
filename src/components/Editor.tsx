@@ -16,8 +16,6 @@ export const Editor: React.FC = () => {
     setSignature,
     subtitle,
     setSubtitle,
-    selectedShip,
-    setSelectedShip,
     events,
     setEvents,
     crew,
@@ -53,28 +51,6 @@ export const Editor: React.FC = () => {
               <option value="skirmish">Skirmish</option>
             </select>
           </div>
-
-        <div>
-            <label
-            htmlFor="ship-select"
-            className="block text-sm font-medium mb-2"
-            >
-            Select Ship
-            </label>
-          <select
-            id="ship-select"
-            value={selectedShip}
-            onChange={(e) => setSelectedShip(e.target.value as ShipType)}
-            className="w-full p-2 bg-[#3a3a3a] rounded border border-gray-600 text-white"
-          >
-            {log_icons.map(function(object, i){
-                return <option value={object.value} key={i}>{object.name}</option>;
-            })}
-          </select>
-            <p className="text-xs text-gray-400 mt-1">
-               Will display on the background of the log as a watermark.
-            </p>
-        </div>
 
         <div>
           <label className="block text-sm font-medium mb-2">Log Title</label>
