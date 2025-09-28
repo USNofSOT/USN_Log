@@ -38,7 +38,7 @@ export const LogPreview: React.FC = () => {
         id={isVisible ? "visible-page" : undefined}
         className="bg-cover rounded-lg pb-28 mb-8"
         style={{
-          backgroundImage: `url('${log_backgrounds[logBackground as keyof typeof log_backgrounds]}')`,
+          backgroundImage: `url('${log_backgrounds[logBackground as keyof typeof log_backgrounds].path}')`,
           width: "816px",
           height: "1190px",
           boxShadow: "0 0 20px rgba(0,0,0,0.3)",

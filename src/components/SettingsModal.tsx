@@ -79,7 +79,7 @@ export const SettingsModal: React.FC = () => {
               >
                 {
                   Object.entries(log_backgrounds).map(([key], i) => {
-                    return <option value={key} key={i}>{key}</option>;
+                    return <option value={key} key={i}>{log_backgrounds[key as keyof typeof log_backgrounds].name}</option>;
                   })
                 }
               </select>

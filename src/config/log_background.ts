@@ -1,3 +1,6 @@
 export const log_backgrounds = {
-  Parchment: "log_background/parchment.png",
+  Parchment: {
+    name: "Parchment",
+    path: "log_background/parchment.png",
+  },
 }
