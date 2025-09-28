@@ -26,6 +26,7 @@ interface LogContextType {
   isCopyModalOpen: boolean;
   titleFont: string;
   bodyFont: string;
+  logBackground: string;
   activePageIndex: number;
   pages: string[];
 
@@ -45,6 +46,7 @@ interface LogContextType {
   setIsCopyModalOpen: (isOpen: boolean) => void;
   setTitleFont: (font: string) => void;
   setBodyFont: (font: string) => void;
+  setLogBackground: (background: string) => void;
   setActivePageIndex: (index: number) => void;
 
   // Actions

@@ -2,6 +2,7 @@ import React from "react";
 import { Printer } from "lucide-react";
 import { useLog } from "../context/LogContext";
 import { ShipType } from "../hooks/useLogState";
+import { log_icons } from "../config/log_icons";
 
 export const Editor: React.FC = () => {
   const {
@@ -43,34 +44,36 @@ export const Editor: React.FC = () => {
         {/* Mode Toggle */}
         <div>
           <label className="block text-sm font-medium mb-2">Mode</label>
-          <select
-            value={mode}
-            onChange={(e) => setMode(e.target.value as "patrol" | "skirmish")}
-            className="w-full p-2 bg-[#3a3a3a] rounded border border-gray-600 text-white"
-          >
-            <option value="patrol">Patrol</option>
-            <option value="skirmish">Skirmish</option>
-          </select>
-        </div>
+            <select
+              value={mode}
+              onChange={(e) => setMode(e.target.value as "patrol" | "skirmish")}
+              className="w-full p-2 bg-[#3a3a3a] rounded border border-gray-600 text-white"
+            >
+              <option value="patrol">Patrol</option>
+              <option value="skirmish">Skirmish</option>
+            </select>
+          </div>
 
         <div>
-          <label
+            <label
             htmlFor="ship-select"
             className="block text-sm font-medium mb-2"
-          >
+            >
             Select Ship
-          </label>
+            </label>
           <select
             id="ship-select"
             value={selectedShip}
             onChange={(e) => setSelectedShip(e.target.value as ShipType)}
             className="w-full p-2 bg-[#3a3a3a] rounded border border-gray-600 text-white"
           >
-            <option value="valhalla">Valhalla</option>
-            <option value="fenrir">Fenrir</option>
-            <option value="odin">Odin</option>
-            <option value="tyr">Tyr</option>
+            {log_icons.map(function(object, i){
+                return <option value={object.value} key={i}>{object.name}</option>;
+            })}
           </select>
+            <p className="text-xs text-gray-400 mt-1">
+               Will display on the background of the log as a watermark.
+            </p>
         </div>
 
         <div>
@@ -287,6 +290,13 @@ export const Editor: React.FC = () => {
             Copy Discord Message
           </button>
         </div>
+            <button
+              onClick={() => setIsCopyModalOpen(true)}
+              className="mt-2 w-full bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded"
+              type="button"
+            >
+              Preview Discord Message
+          </button>
       </div>
     </div>
   );

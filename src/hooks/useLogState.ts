@@ -8,7 +8,7 @@ type DiveEntry = {
 };
 
 export type LogMode = "patrol" | "skirmish";
-export type ShipType = "valhalla" | "fenrir" | "tyr" | "odin";
+export type ShipType = string;
 
 export function useLogState() {
   // Mode and basic fields
@@ -37,6 +37,9 @@ export function useLogState() {
   const [titleFont, setTitleFont] = useState("Satisfy");
   const [bodyFont, setBodyFont] = useState("Indie_Flower");
 
+  // Log background
+  const [logBackground, setLogBackground] = useState("Parchment");
+
   // For tabbing between preview pages
   const [activePageIndex, setActivePageIndex] = useState(0);
 
@@ -63,6 +66,7 @@ export function useLogState() {
     const savedSelectedShip = localStorage.getItem("selectedShip");
     const savedTitleFont = localStorage.getItem("titleFont");
     const savedBodyFont = localStorage.getItem("bodyFont");
+    const savedLogBackground = localStorage.getItem("logBackground");
 
     if (savedTitle) setTitle(savedTitle);
     if (savedBody) setBody(savedBody);
@@ -77,6 +81,7 @@ export function useLogState() {
     if (savedSelectedShip) setSelectedShip(savedSelectedShip as ShipType);
     if (savedTitleFont) setTitleFont(savedTitleFont);
     if (savedBodyFont) setBodyFont(savedBodyFont);
+    if (savedLogBackground) setLogBackground(savedLogBackground);
   }, []);
 
   // Helper: Debounce calls to localStorage
@@ -108,6 +113,7 @@ export function useLogState() {
       localStorage.setItem("selectedShip", selectedShip);
       localStorage.setItem("titleFont", titleFont);
       localStorage.setItem("bodyFont", bodyFont);
+      localStorage.setItem("logBackground", logBackground);
     };
     const debouncedSave = debounce(saveToLocalStorage, 500);
     debouncedSave();
@@ -354,6 +360,7 @@ export function useLogState() {
     isCopyModalOpen,
     titleFont,
     bodyFont,
+    logBackground,
     activePageIndex,
     pages,
 
@@ -374,6 +381,7 @@ export function useLogState() {
     setIsCopyModalOpen,
     setTitleFont,
     setBodyFont,
+    setLogBackground,
     setActivePageIndex,
 
     // Actions

@@ -1,5 +1,7 @@
 import React from "react";
 import { useLog } from "../context/LogContext";
+import { log_icons } from "../config/log_icons";
+import { log_backgrounds } from "../config/log_background";
 
 export const LogPreview: React.FC = () => {
   const {
@@ -18,15 +20,13 @@ export const LogPreview: React.FC = () => {
     dives,
     titleFont,
     bodyFont,
+    logBackground,
     formatList,
   } = useLog();
-
-  const shipLogos: Record<string, string> = {
-    valhalla: "/USN_Log/ships/valhalla.png",
-    fenrir: "", // todo: add fenrir logo
-    odin: "/USN_Log/ships/odin.png",
-    tyr: "/USN_Log/ships/tyr.png",
-  };
+  const shipLogos: Record<string, string> = log_icons.reduce((acc, icon) => {
+    acc[icon.value] = icon.path;
+    return acc;
+  }, {} as Record<string, string>);
 
   const renderPage = (pageText: string, idx: number, isVisible: boolean) => {
     const displayStyle = isVisible ? "block" : "none";
@@ -36,8 +36,9 @@ export const LogPreview: React.FC = () => {
       <div
         key={idx}
         id={isVisible ? "visible-page" : undefined}
-        className="bg-[url('/parchment.png')] bg-cover rounded-lg pb-28 mb-8"
+        className="bg-cover rounded-lg pb-28 mb-8"
         style={{
+          backgroundImage: `url('${log_backgrounds[logBackground as keyof typeof log_backgrounds]}')`,
           width: "816px",
           height: "1190px",
           boxShadow: "0 0 20px rgba(0,0,0,0.3)",
@@ -46,21 +47,23 @@ export const LogPreview: React.FC = () => {
         }}
       >
         {/* Ship Logo */}
-        <img
-          src={shipLogos[selectedShip]}
-          onError={(e) => {
-            e.currentTarget.src = "/USN_Log/ships/valhalla.png";
-          }}
-          alt="Ship Logo"
-          crossOrigin="anonymous"
-          className="absolute inset-0 m-auto"
-          style={{
-            width: "50%",
-            height: "auto",
-            opacity: 0.3,
-            zIndex: 0,
-          }}
-        />
+          {selectedShip !== 'none' && (
+            <img
+              src={shipLogos[selectedShip]}
+              onError={(e) => {
+                e.currentTarget.src = "/USN_Log/log_icons/usn_logo.png";
+              }}
+              alt="Ship Logo"
+              crossOrigin="anonymous"
+              className="absolute inset-0 m-auto"
+              style={{
+                width: "50%",
+                height: "auto",
+                opacity: 0.3,
+                zIndex: 0,
+              }}
+            />
+          )}
 
         <div
           id="writing-area"

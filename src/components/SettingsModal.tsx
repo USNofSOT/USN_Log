@@ -1,5 +1,6 @@
 import React from "react";
 import { useLog } from "../context/LogContext";
+import { log_backgrounds } from "../config/log_background";
 
 export const SettingsModal: React.FC = () => {
   const {
@@ -7,6 +8,8 @@ export const SettingsModal: React.FC = () => {
     setIsModalOpen,
     titleFont,
     bodyFont,
+    logBackground,
+    setLogBackground,
     setTitleFont,
     setBodyFont,
     loadTestingData,
@@ -32,7 +35,6 @@ export const SettingsModal: React.FC = () => {
               <option value="Dancing_Script">Dancing Script</option>
             </select>
           </div>
-
           <div>
             <label className="block text-sm font-medium mb-2">
               Log Entry Font
@@ -46,6 +48,22 @@ export const SettingsModal: React.FC = () => {
               <option value="Indie_Flower">Indie Flower</option>
               <option value="Dancing_Script">Dancing Script</option>
             </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">
+              Log Background
+            </label>
+              <select
+                value={logBackground}
+                onChange={(e) => setLogBackground(e.target.value)}
+                className="w-full p-2 bg-gray-700 rounded border border-gray-600 text-white"
+              >
+                {
+                  Object.entries(log_backgrounds).map(([key], i) => {
+                    return <option value={key} key={i}>{key}</option>;
+                  })
+                }
+              </select>
           </div>
         </div>
         <div className="mt-6 flex justify-between">
