@@ -36,6 +36,9 @@ interface LogContextType {
   subtitleFont: string;
   headerFont: string;
   listFont: string;
+  showSignatureOnLastPage: boolean;
+  showTitleOnFirstPage: boolean;
+  showExtrasOnLastPage: boolean;
 
   // Setters
   setMode: (mode: "patrol" | "skirmish") => void;
@@ -62,6 +65,9 @@ interface LogContextType {
   setSubtitleFont: (font: string) => void;
   setHeaderFont: (font: string) => void;
   setListFont: (font: string) => void;
+  setShowSignatureOnLastPage: (show: boolean) => void;
+  setShowTitleOnFirstPage: (show: boolean) => void;
+  setShowExtrasOnLastPage: (show: boolean) => void;
 
   // Actions
   addNewDive: () => void;

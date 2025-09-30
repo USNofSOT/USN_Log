@@ -26,6 +26,8 @@ export const LogPreview: React.FC = () => {
     listFont,
     logBackground,
     formatList,
+    showTitleOnFirstPage,
+    showExtrasOnLastPage,
   } = useLog();
   const shipLogos: Record<string, string> = log_icons.reduce((acc, icon) => {
     acc[icon.value] = icon.path;
@@ -35,6 +37,7 @@ export const LogPreview: React.FC = () => {
   const renderPage = (pageText: string, idx: number, isVisible: boolean) => {
     const displayStyle = isVisible ? "block" : "none";
     const isLastPage = idx === pages.length - 1;
+    const isFirstPage = idx === 0;
 
     return (
       <div
@@ -73,11 +76,14 @@ export const LogPreview: React.FC = () => {
           id="writing-area"
           className="p-12 h-full flex flex-col relative z-10"
         >
-          <h2
-            className={`text-5xl text-center ml-16 mr-16 mt-12 mb-8 font-${titleFont} text-black whitespace-pre-wrap`}
-          >
-            {title || "Log Title"}
-          </h2>
+          {/* Conditional title rendering */}
+          {(showTitleOnFirstPage ? isFirstPage : true) && (
+            <h2
+              className={`text-5xl text-center ml-16 mr-16 mt-12 mb-8 font-${titleFont} text-black whitespace-pre-wrap`}
+            >
+              {title || "Log Title"}
+            </h2>
+          )}
 
           <div
             className={`font-${bodyFont} text-base flex-grow whitespace-pre-wrap text-black leading-relaxed p-2`}
@@ -85,51 +91,55 @@ export const LogPreview: React.FC = () => {
             {pageText || "Your log entry will appear here..."}
           </div>
 
-          {/* On last page, we render either "Patrol" fields or "Skirmish" fields */}
           {isLastPage && mode === "patrol" && (
             <>
-              {/* Patrol Layout: Events + Crew */}
-              <div className="grid grid-cols-2 gap-8 ml-6 mt-4">
-                <div>
-                  <h3 className={`font-${headerFont} text-2xl text-black mb-2`}>
-                    Notable Events
-                  </h3>
-                  <ul
-                    className={`list-none font-${listFont} text-lg text-black`}
-                    style={{
-                      columns: "2",
-                      columnGap: "1rem",
-                      breakInside: "avoid-column",
-                    }}
-                  >
-                    {formatList(events).map((ev, i) => (
-                      <li key={i} style={{ breakInside: "avoid-column" }}>
-                        {ev}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+              {(showExtrasOnLastPage ? isLastPage : true) && (
+                <div className="grid grid-cols-2 gap-8 ml-6 mt-4">
+                  {events && (
+                    <div>
+                      <h3 className={`font-${headerFont} text-2xl text-black mb-2`}>
+                        Notable Events
+                      </h3>
+                      <ul
+                        className={`list-none font-${listFont} text-lg text-black`}
+                        style={{
+                          columns: "2",
+                          columnGap: "1rem",
+                          breakInside: "avoid-column",
+                        }}
+                      >
+                        {formatList(events).map((ev, i) => (
+                          <li key={i} style={{ breakInside: "avoid-column" }}>
+                            {ev}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
 
-                <div>
-                  <h3 className={`font-${headerFont} text-2xl text-black mb-2`}>
-                    Crew Manifest
-                  </h3>
-                  <ul
-                    className={`list-none font-${listFont} text-lg text-black`}
-                    style={{
-                      columns: "2",
-                      columnGap: "1rem",
-                      breakInside: "avoid-column",
-                    }}
-                  >
-                    {formatList(crew).map((member, i) => (
-                      <li key={i} style={{ breakInside: "avoid-column" }}>
-                        {member}
-                      </li>
-                    ))}
-                  </ul>
+                  {crew && (
+                    <div>
+                      <h3 className={`font-${headerFont} text-2xl text-black mb-2`}>
+                        Crew Manifest
+                      </h3>
+                      <ul
+                        className={`list-none font-${listFont} text-lg text-black`}
+                        style={{
+                          columns: "2",
+                          columnGap: "1rem",
+                          breakInside: "avoid-column",
+                        }}
+                      >
+                        {formatList(crew).map((member, i) => (
+                          <li key={i} style={{ breakInside: "avoid-column" }}>
+                            {member}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
-              </div>
+              )}
 
               {/* Gold + Doubloons + Signature */}
               <div className="flex justify-between items-end">
@@ -158,19 +168,72 @@ export const LogPreview: React.FC = () => {
                   </div>
                 </div>
 
-                <div
-                  className={`font-${signatureFont} absolute right-16 bottom-0 text-5xl text-black font-bold whitespace-pre-wrap`}
-                  style={{
-                    transform: "rotate(-4deg)",
-                    textShadow: "1px 1px 2px rgba(0,0,0,0.1)",
-                  }}
-                >
-                  {signature || "Your Signature"}
-                  {subtitle && (
-                    <div className={`font-${subtitleFont} text-3xl mt-2 text-right`}>{subtitle}</div>
-                  )}
-                </div>
+                {(showExtrasOnLastPage ? isLastPage : true) && (
+                  <div
+                    className={`font-${signatureFont} absolute right-16 bottom-0 text-5xl text-black font-bold whitespace-pre-wrap`}
+                    style={{
+                      transform: "rotate(-4deg)",
+                      textShadow: "1px 1px 2px rgba(0,0,0,0.1)",
+                    }}
+                  >
+                    {signature || "Your Signature"}
+                    {subtitle && (
+                      <div className={`font-${subtitleFont} text-3xl mt-2 text-right`}>{subtitle}</div>
+                    )}
+                  </div>
+                )}
               </div>
+            </>
+          )}
+
+          {!isLastPage && (
+            <>
+
+              {!showExtrasOnLastPage && mode === "patrol" && (
+                <>
+                  {events && (
+                    <div className="mt-4">
+                      <h3 className={`font-${headerFont} text-2xl text-black mb-2`}>
+                        Notable Events
+                      </h3>
+                      <ul className={`list-none font-${listFont} text-lg text-black`}>
+                        {formatList(events).map((ev, i) => (
+                          <li key={i}>{ev}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* Crew */}
+                  {crew && (
+                    <div className="mt-4">
+                      <h3 className={`font-${headerFont} text-2xl text-black mb-2`}>
+                        Crew Manifest
+                      </h3>
+                      <ul className={`list-none font-${listFont} text-lg text-black`}>
+                        {formatList(crew).map((member, i) => (
+                          <li key={i}>{member}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  <div className="flex justify-end mt-auto">
+                    <div
+                      className={`font-${signatureFont} text-5xl text-black font-bold whitespace-pre-wrap`}
+                      style={{
+                        transform: "rotate(-4deg)",
+                        textShadow: "1px 1px 2px rgba(0,0,0,0.1)",
+                      }}
+                    >
+                      {signature || "Your Signature"}
+                      {subtitle && (
+                        <div className={`font-${subtitleFont} text-3xl mt-2 text-right`}>{subtitle}</div>
+                      )}
+                    </div>
+                  </div>
+                </>
+              )}
             </>
           )}
 

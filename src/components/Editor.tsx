@@ -1,8 +1,6 @@
 import React from "react";
 import { Printer, SparklesIcon } from "lucide-react";
 import { useLog } from "../context/LogContext";
-import { ShipType } from "../hooks/useLogState";
-import { log_icons } from "../config/log_icons";
 
 export const Editor: React.FC = () => {
   const {

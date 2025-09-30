@@ -56,6 +56,13 @@ export function useLogState() {
   // We'll split body text into multiple pages (for the big "body" only)
   const [pages, setPages] = useState<string[]>([]);
 
+  // Display control toggles
+  const [showEventsOnLastPage, setShowEventsOnLastPage] = useState(true);
+  const [showCrewOnLastPage, setShowCrewOnLastPage] = useState(true);
+  const [showSignatureOnLastPage, setShowSignatureOnLastPage] = useState(true);
+  const [showTitleOnFirstPage, setShowTitleOnFirstPage] = useState(false);
+  const [showExtrasOnLastPage, setShowExtrasOnLastPage] = useState(false);
+
   // -----------------------------------
   // Load from localStorage on mount
   // -----------------------------------
@@ -83,6 +90,11 @@ export function useLogState() {
     const savedSubtitleFont = localStorage.getItem("subtitleFont");
     const savedHeaderFont = localStorage.getItem("headerFont");
     const savedListFont = localStorage.getItem("listFont");
+    const savedShowEventsOnLastPage = localStorage.getItem("showEventsOnLastPage");
+    const savedShowCrewOnLastPage = localStorage.getItem("showCrewOnLastPage");
+    const savedShowSignatureOnLastPage = localStorage.getItem("showSignatureOnLastPage");
+    const savedShowTitleOnFirstPage = localStorage.getItem("showTitleOnFirstPage");
+    const savedShowExtrasOnLastPage = localStorage.getItem("showExtrasOnLastPage");
 
     if (savedTitle) setTitle(savedTitle);
     if (savedBody) setBody(savedBody);
@@ -104,6 +116,11 @@ export function useLogState() {
     if (savedSubtitleFont) setSubtitleFont(savedSubtitleFont);
     if (savedHeaderFont) setHeaderFont(savedHeaderFont);
     if (savedListFont) setListFont(savedListFont);
+    if (savedShowEventsOnLastPage !== null) setShowEventsOnLastPage(savedShowEventsOnLastPage === "true");
+    if (savedShowCrewOnLastPage !== null) setShowCrewOnLastPage(savedShowCrewOnLastPage === "true");
+    if (savedShowSignatureOnLastPage !== null) setShowSignatureOnLastPage(savedShowSignatureOnLastPage === "true");
+    if (savedShowTitleOnFirstPage !== null) setShowTitleOnFirstPage(savedShowTitleOnFirstPage === "true");
+    if (savedShowExtrasOnLastPage !== null) setShowExtrasOnLastPage(savedShowExtrasOnLastPage === "true");
   }, []);
 
   // Helper: Debounce calls to localStorage
@@ -142,6 +159,11 @@ export function useLogState() {
       localStorage.setItem("subtitleFont", subtitleFont);
       localStorage.setItem("headerFont", headerFont);
       localStorage.setItem("listFont", listFont);
+      localStorage.setItem("showEventsOnLastPage", showEventsOnLastPage.toString());
+      localStorage.setItem("showCrewOnLastPage", showCrewOnLastPage.toString());
+      localStorage.setItem("showSignatureOnLastPage", showSignatureOnLastPage.toString());
+      localStorage.setItem("showTitleOnFirstPage", showTitleOnFirstPage.toString());
+      localStorage.setItem("showExtrasOnLastPage", showExtrasOnLastPage.toString());
     };
     const debouncedSave = debounce(saveToLocalStorage, 500);
     debouncedSave();
@@ -167,6 +189,11 @@ export function useLogState() {
     subtitleFont,
     headerFont,
     listFont,
+    showEventsOnLastPage,
+    showCrewOnLastPage,
+    showSignatureOnLastPage,
+    ,
+    showExtrasOnLastPage,
   ]);
 
   // Pagination logic
@@ -405,6 +432,11 @@ export function useLogState() {
     logBackground,
     activePageIndex,
     pages,
+    showEventsOnLastPage,
+    showCrewOnLastPage,
+    showSignatureOnLastPage,
+    showTitleOnFirstPage,
+    showExtrasOnLastPage,
 
     // Setters
     setMode,
@@ -432,6 +464,11 @@ export function useLogState() {
     setLogIcon,
     setLogBackground,
     setActivePageIndex,
+    setShowEventsOnLastPage,
+    setShowCrewOnLastPage,
+    setShowSignatureOnLastPage,
+    setShowTitleOnFirstPage,
+    setShowExtrasOnLastPage,
 
     // Actions
     addNewDive,
