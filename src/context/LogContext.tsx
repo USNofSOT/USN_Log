@@ -44,6 +44,8 @@ interface LogContextType {
   listFontSize: number;
   contentPadding: number;
   contentMargin: number;
+  enableEvents: boolean;
+  enableCrew: boolean;
 
   // Setters
   setMode: (mode: "patrol" | "skirmish") => void;
@@ -78,6 +80,8 @@ interface LogContextType {
   setListFontSize: (size: number) => void;
   setContentPadding: (padding: number) => void;
   setContentMargin: (margin: number) => void;
+  setEnableEvents: (enabled: boolean) => void;
+  setEnableCrew: (enabled: boolean) => void;
 
   // Actions
   addNewDive: () => void;

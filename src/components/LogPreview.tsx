@@ -33,6 +33,8 @@ export const LogPreview: React.FC = () => {
     bodyFontSize,
     contentPadding,
     contentMargin,
+    enableEvents,
+    enableCrew,
   } = useLog();
   const shipLogos: Record<string, string> = log_icons.reduce((acc, icon) => {
     acc[icon.value] = icon.path;
@@ -119,7 +121,7 @@ export const LogPreview: React.FC = () => {
                     marginTop: `${contentMargin}px`
                   }}
                 >
-                  {events && (
+                  {enableEvents && events && (
                     <div>
                       <h3 
                         className={`font-${headerFont} text-black`}
@@ -154,7 +156,7 @@ export const LogPreview: React.FC = () => {
                     </div>
                   )}
 
-                  {crew && (
+                  {enableCrew && crew && (
                     <div>
                       <h3 
                         className={`font-${headerFont} text-black`}

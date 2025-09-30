@@ -46,6 +46,10 @@ export const SettingsModal: React.FC = () => {
     contentMargin,
     setContentPadding,
     setContentMargin,
+    enableEvents,
+    enableCrew,
+    setEnableEvents,
+    setEnableCrew,
   } = useLog();
 
   const onClose = () => setIsModalOpen(false);
@@ -92,6 +96,32 @@ export const SettingsModal: React.FC = () => {
                 <div>
                   <span className="font-medium">Show crew, events & signature only on last page</span>
                   <p className="text-xs text-gray-400">When disabled, these elements will appear on all pages</p>
+                </div>
+              </label>
+
+              <label className="flex items-center text-white cursor-pointer hover:bg-[#4a4a4a] p-2 rounded">
+                <input
+                  type="checkbox"
+                  checked={enableEvents}
+                  onChange={(e) => setEnableEvents(e.target.checked)}
+                  className="mr-3 w-4 h-4 accent-blue-500"
+                />
+                <div>
+                  <span className="font-medium">Enable Events section</span>
+                  <p className="text-xs text-gray-400">When disabled, events will not appear in patrol logs</p>
+                </div>
+              </label>
+              
+              <label className="flex items-center text-white cursor-pointer hover:bg-[#4a4a4a] p-2 rounded">
+                <input
+                  type="checkbox"
+                  checked={enableCrew}
+                  onChange={(e) => setEnableCrew(e.target.checked)}
+                  className="mr-3 w-4 h-4 accent-blue-500"
+                />
+                <div>
+                  <span className="font-medium">Enable Crew section</span>
+                  <p className="text-xs text-gray-400">When disabled, crew manifest will not appear in patrol logs</p>
                 </div>
               </label>
             </div>
@@ -394,6 +424,8 @@ export const SettingsModal: React.FC = () => {
                   // Reset display options
                   setShowTitleOnFirstPage(false);
                   setShowExtrasOnLastPage(false);
+                  setEnableEvents(true);
+                  setEnableCrew(true);
                 }
               }}
               className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition-colors flex items-center gap-2"

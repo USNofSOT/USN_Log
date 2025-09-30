@@ -74,6 +74,8 @@ export function useLogState() {
   const [showSignatureOnLastPage, setShowSignatureOnLastPage] = useState(true);
   const [showTitleOnFirstPage, setShowTitleOnFirstPage] = useState(false);
   const [showExtrasOnLastPage, setShowExtrasOnLastPage] = useState(false);
+  const [enableEvents, setEnableEvents] = useState(true);
+  const [enableCrew, setEnableCrew] = useState(true);
 
   // -----------------------------------
   // Load from localStorage on mount
@@ -115,6 +117,9 @@ export function useLogState() {
     const savedContentPadding = localStorage.getItem("contentPadding");
     const savedContentMargin = localStorage.getItem("contentMargin");
 
+    const savedEnableEvents = localStorage.getItem("enableEvents");
+    const savedEnableCrew = localStorage.getItem("enableCrew");
+
     if (savedTitle) setTitle(savedTitle);
     if (savedBody) setBody(savedBody);
     if (savedSignature) setSignature(savedSignature);
@@ -145,6 +150,8 @@ export function useLogState() {
     if (savedListFontSize) setListFontSize(parseInt(savedListFontSize));
     if (savedContentPadding) setContentPadding(parseInt(savedContentPadding));
     if (savedContentMargin) setContentMargin(parseInt(savedContentMargin));
+    if (savedEnableEvents !== null) setEnableEvents(savedEnableEvents === "true");
+    if (savedEnableCrew !== null) setEnableCrew(savedEnableCrew === "true");
   }, []);
 
   // Helper: Debounce calls to localStorage
@@ -192,6 +199,8 @@ export function useLogState() {
       localStorage.setItem("listFontSize", listFontSize.toString());
       localStorage.setItem("contentPadding", contentPadding.toString());
       localStorage.setItem("contentMargin", contentMargin.toString());
+      localStorage.setItem("enableEvents", enableEvents.toString());
+      localStorage.setItem("enableCrew", enableCrew.toString());
     };
     const debouncedSave = debounce(saveToLocalStorage, 500);
     debouncedSave();
@@ -226,6 +235,8 @@ export function useLogState() {
     listFontSize,
     contentPadding,
     contentMargin,
+    enableEvents,
+    enableCrew,
   ]);
 
   // Pagination logic
@@ -385,16 +396,23 @@ export function useLogState() {
 
     // Format patrol-specific content
     const formatPatrolContent = () => {
-      const sections = [
-        "Events:",
-        events || "N/A",
-        "",
-        `Gold: ${gold || "0"}`,
-        `Doubloons: ${doubloons || "0"}`,
-        "",
-        "Crew:",
-        crew || "N/A",
-      ];
+      const sections = [];
+      
+      if (enableEvents) {
+        sections.push("Events:");
+        sections.push(events || "N/A");
+        sections.push("");
+      }
+      
+      sections.push(`Gold: ${gold || "0"}`);
+      sections.push(`Doubloons: ${doubloons || "0"}`);
+      sections.push("");
+      
+      if (enableCrew) {
+        sections.push("Crew:");
+        sections.push(crew || "N/A");
+      }
+      
       return sections.join("\n");
     };
 
@@ -470,6 +488,8 @@ export function useLogState() {
     listFontSize,
     contentPadding,
     contentMargin,
+    enableEvents,
+    enableCrew,
 
     // Setters
     setMode,
@@ -507,6 +527,8 @@ export function useLogState() {
     setListFontSize,
     setContentPadding,
     setContentMargin,
+    setEnableEvents,
+    setEnableCrew,
 
     // Actions
     addNewDive,
