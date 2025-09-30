@@ -3,6 +3,7 @@ import { defaultFonts } from "../config/fonts";
 import { defaultFontSizes } from "../config/fontSizes";
 import { defaultSpacing } from "../config/spacing";
 import { appearanceDefaults } from "../config/appearance";
+import { defaultDiscordFormat, defaultImageFormat } from "../config/formats";
 
 type DiveEntry = {
   ourTeam: "Athena" | "Reaper";
@@ -77,6 +78,10 @@ export function useLogState() {
   const [enableEvents, setEnableEvents] = useState(true);
   const [enableCrew, setEnableCrew] = useState(true);
 
+  // Format state
+  const [discordFormat, setDiscordFormat] = useState(defaultDiscordFormat);
+  const [imageFormat, setImageFormat] = useState(defaultImageFormat);
+
   // -----------------------------------
   // Load from localStorage on mount
   // -----------------------------------
@@ -120,6 +125,10 @@ export function useLogState() {
     const savedEnableEvents = localStorage.getItem("enableEvents");
     const savedEnableCrew = localStorage.getItem("enableCrew");
 
+    const savedDiscordFormat = localStorage.getItem("discordFormat");
+    const savedImageFormat = localStorage.getItem("imageFormat");
+    const savedLogBackground = localStorage.getItem("logBackground");
+
     if (savedTitle) setTitle(savedTitle);
     if (savedBody) setBody(savedBody);
     if (savedSignature) setSignature(savedSignature);
@@ -145,13 +154,16 @@ export function useLogState() {
     if (savedShowExtrasOnLastPage !== null) setShowExtrasOnLastPage(savedShowExtrasOnLastPage === "true");
     if (savedTitleFontSize) setTitleFontSize(parseInt(savedTitleFontSize));
     if (savedBodyFontSize) setBodyFontSize(parseInt(savedBodyFontSize));
-    if (savedSignatureFontSize) setSignatureFontSize(parseInt(savedSignatureFontSize));
+    if (savedSignatureFontSize) setSignatureFontSize(parseInt(savedSignatureFontSize).toString());
     if (savedHeaderFontSize) setHeaderFontSize(parseInt(savedHeaderFontSize));
     if (savedListFontSize) setListFontSize(parseInt(savedListFontSize));
     if (savedContentPadding) setContentPadding(parseInt(savedContentPadding));
     if (savedContentMargin) setContentMargin(parseInt(savedContentMargin));
     if (savedEnableEvents !== null) setEnableEvents(savedEnableEvents === "true");
     if (savedEnableCrew !== null) setEnableCrew(savedEnableCrew === "true");
+    if (savedDiscordFormat) setDiscordFormat(savedDiscordFormat);
+    if (savedImageFormat) setImageFormat(savedImageFormat);
+    if (savedLogBackground) setLogBackground(savedLogBackground);
   }, []);
 
   // Helper: Debounce calls to localStorage
@@ -179,7 +191,9 @@ export function useLogState() {
       localStorage.setItem("doubloons", doubloons);
       localStorage.setItem("ourTeam", ourTeam);
       localStorage.setItem("dives", JSON.stringify(dives));
-      localStorage.setItem("logIcon", titleFont);
+      localStorage.setItem("logIcon", logIcon);
+      localStorage.setItem("logBackground", logBackground);
+      localStorage.setItem("titleFont", titleFont);
       localStorage.setItem("bodyFont", bodyFont);
       localStorage.setItem("mainShip", mainShip);
       localStorage.setItem("auxiliaryShip", auxiliaryShip);
@@ -201,6 +215,8 @@ export function useLogState() {
       localStorage.setItem("contentMargin", contentMargin.toString());
       localStorage.setItem("enableEvents", enableEvents.toString());
       localStorage.setItem("enableCrew", enableCrew.toString());
+      localStorage.setItem("discordFormat", discordFormat);
+      localStorage.setItem("imageFormat", imageFormat);
     };
     const debouncedSave = debounce(saveToLocalStorage, 500);
     debouncedSave();
@@ -217,6 +233,8 @@ export function useLogState() {
     dives,
     titleFont,
     bodyFont,
+    logIcon,
+    logBackground,
     mainShip,
     auxiliaryShip,
     voyageNumber,
@@ -226,7 +244,7 @@ export function useLogState() {
     showEventsOnLastPage,
     showCrewOnLastPage,
     showSignatureOnLastPage,
-    ,
+    showTitleOnFirstPage,
     showExtrasOnLastPage,
     titleFontSize,
     bodyFontSize,
@@ -237,6 +255,8 @@ export function useLogState() {
     contentMargin,
     enableEvents,
     enableCrew,
+    discordFormat,
+    imageFormat,
   ]);
 
   // Pagination logic
@@ -490,6 +510,8 @@ export function useLogState() {
     contentMargin,
     enableEvents,
     enableCrew,
+    discordFormat,
+    imageFormat,
 
     // Setters
     setMode,
@@ -529,6 +551,8 @@ export function useLogState() {
     setContentMargin,
     setEnableEvents,
     setEnableCrew,
+    setDiscordFormat,
+    setImageFormat,
 
     // Actions
     addNewDive,

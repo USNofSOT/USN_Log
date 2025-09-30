@@ -1,7 +1,8 @@
-import React, { createContext, useContext } from "react";
+import React, { createContext, useContext, useState } from "react";
 import { useLogState } from "../hooks/useLogState";
 import { useExport } from "../hooks/useExport";
 import { ShipType } from "../hooks/useLogState";
+import { defaultDiscordFormat, defaultImageFormat } from "../config/formats";
 
 interface LogContextType {
   // State
@@ -46,6 +47,8 @@ interface LogContextType {
   contentMargin: number;
   enableEvents: boolean;
   enableCrew: boolean;
+  discordFormat: string;
+  imageFormat: string;
 
   // Setters
   setMode: (mode: "patrol" | "skirmish") => void;
@@ -82,6 +85,8 @@ interface LogContextType {
   setContentMargin: (margin: number) => void;
   setEnableEvents: (enabled: boolean) => void;
   setEnableCrew: (enabled: boolean) => void;
+  setDiscordFormat: (format: string) => void;
+  setImageFormat: (format: string) => void;
 
   // Actions
   addNewDive: () => void;

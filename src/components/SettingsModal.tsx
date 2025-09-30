@@ -6,7 +6,7 @@ import { availableFonts, defaultFonts } from "../config/fonts";
 import { fontSizeConfig, defaultFontSizes } from "../config/fontSizes";
 import { spacingConfig, defaultSpacing } from "../config/spacing";
 import { appearanceDefaults } from "../config/appearance";
-import { ShipType } from "../hooks/useLogState";
+import { discordFormats, imageFormats, defaultDiscordFormat, defaultImageFormat } from "../config/formats";
 import { RepeatIcon } from "lucide-react";
 
 export const SettingsModal: React.FC = () => {
@@ -50,6 +50,10 @@ export const SettingsModal: React.FC = () => {
     enableCrew,
     setEnableEvents,
     setEnableCrew,
+    discordFormat,
+    imageFormat,
+    setDiscordFormat,
+    setImageFormat,
   } = useLog();
 
   const onClose = () => setIsModalOpen(false);
@@ -300,6 +304,8 @@ export const SettingsModal: React.FC = () => {
                   setContentMargin(defaultSpacing.margin);
                   setLogBackground(appearanceDefaults.logBackground);
                   setLogIcon(appearanceDefaults.logIcon);
+                  setDiscordFormat(defaultDiscordFormat);
+                  setImageFormat(defaultImageFormat);
                 }
               }}
               className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-3 rounded flex items-center gap-2"
@@ -338,6 +344,37 @@ export const SettingsModal: React.FC = () => {
                       <option value={icon.value} key={i}>{icon.name}</option>
                     ))}
                   </select>
+                </div>
+              </div>
+              
+              {/* Format Settings */}
+              <div className="grid grid-cols-2 gap-4 mt-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Discord Format</label>
+                  <select
+                    value={discordFormat}
+                    onChange={(e) => setDiscordFormat(e.target.value)}
+                    className="w-full p-2 bg-gray-700 rounded border border-gray-600 text-white focus:border-blue-500"
+                  >
+                    {Object.entries(discordFormats).map(([key, format]) => (
+                      <option key={key} value={key}>{format.name}</option>
+                    ))}
+                  </select>
+                  <p className="text-xs text-gray-500 mt-1">Format for Discord output</p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2">Image Format</label>
+                  <select
+                    value={imageFormat}
+                    onChange={(e) => setImageFormat(e.target.value)}
+                    className="w-full p-2 bg-gray-700 rounded border border-gray-600 text-white focus:border-blue-500"
+                  >
+                    {Object.entries(imageFormats).map(([key, format]) => (
+                      <option key={key} value={key}>{format.name}</option>
+                    ))}
+                  </select>
+                  <p className="text-xs text-gray-500 mt-1">Format for image generation</p>
                 </div>
               </div>
             </div>
@@ -420,6 +457,10 @@ export const SettingsModal: React.FC = () => {
                   // Reset appearance
                   setLogBackground(appearanceDefaults.logBackground);
                   setLogIcon(appearanceDefaults.logIcon);
+                  
+                  // Reset formats
+                  setDiscordFormat(defaultDiscordFormat);
+                  setImageFormat(defaultImageFormat);
                   
                   // Reset display options
                   setShowTitleOnFirstPage(false);
