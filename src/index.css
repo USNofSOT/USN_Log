@@ -1,3 +1,7 @@
+@import url(
+  "https://fonts.googleapis.com/css2?family=Dancing+Script&family=Domine&family=Indie+Flower&family=Open+Sans&family=Satisfy&display=swap"
+);
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -6,4 +10,25 @@ body {
   margin: 0;
   padding: 0;
   background: #1a1a1a;
+}
+
+/* add tailwind font specifications e.g. font-['satisfy'] for the fonts in fonts.ts */
+
+.font-Satisfy {
+  font-family: "Satisfy", cursive;
+}
+.font-Indie_Flower {
+  font-family: "Indie Flower", cursive;
+}
+.font-Dancing_Script {
+  font-family: "Dancing Script", cursive;
+}
+.font-Times_New_Roman {
+  font-family: "Times New Roman", serif;
+}
+.font-Domine {
+  font-family: "Domine", serif;
+}
+.font-Open_Sans {
+  font-family: "Open Sans", sans-serif;
 }

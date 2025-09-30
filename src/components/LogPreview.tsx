@@ -74,13 +74,13 @@ export const LogPreview: React.FC = () => {
           className="p-12 h-full flex flex-col relative z-10"
         >
           <h2
-            className={`text-5xl text-center ml-16 mr-16 mt-12 mb-8 font-['${titleFont}'] text-black whitespace-pre-wrap`}
+            className={`text-5xl text-center ml-16 mr-16 mt-12 mb-8 font-${titleFont} text-black whitespace-pre-wrap`}
           >
             {title || "Log Title"}
           </h2>
 
           <div
-            className={`font-['${bodyFont}'] text-base flex-grow whitespace-pre-wrap text-black leading-relaxed p-2`}
+            className={`font-${bodyFont} text-base flex-grow whitespace-pre-wrap text-black leading-relaxed p-2`}
           >
             {pageText || "Your log entry will appear here..."}
           </div>
@@ -91,11 +91,11 @@ export const LogPreview: React.FC = () => {
               {/* Patrol Layout: Events + Crew */}
               <div className="grid grid-cols-2 gap-8 ml-6 mt-4">
                 <div>
-                  <h3 className={`font-['${headerFont}'] text-2xl text-black mb-2`}>
+                  <h3 className={`font-${headerFont} text-2xl text-black mb-2`}>
                     Notable Events
                   </h3>
                   <ul
-                    className={`list-none font-['${listFont}'] text-lg text-black`}
+                    className={`list-none font-${listFont} text-lg text-black`}
                     style={{
                       columns: "2",
                       columnGap: "1rem",
@@ -111,11 +111,11 @@ export const LogPreview: React.FC = () => {
                 </div>
 
                 <div>
-                  <h3 className={`font-['${headerFont}'] text-2xl text-black mb-2`}>
+                  <h3 className={`font-${headerFont} text-2xl text-black mb-2`}>
                     Crew Manifest
                   </h3>
                   <ul
-                    className={`list-none font-['${listFont}'] text-lg text-black`}
+                    className={`list-none font-${listFont} text-lg text-black`}
                     style={{
                       columns: "2",
                       columnGap: "1rem",
@@ -141,7 +141,7 @@ export const LogPreview: React.FC = () => {
                       crossOrigin="anonymous"
                       className="w-8 h-8"
                     />
-                    <span className={`font-['${listFont}'] text-2xl text-black`}>
+                    <span className={`font-${listFont} text-2xl text-black`}>
                       {gold || "0"}
                     </span>
                   </div>
@@ -152,14 +152,14 @@ export const LogPreview: React.FC = () => {
                       crossOrigin="anonymous"
                       className="w-8 h-8"
                     />
-                    <span className={`font-['${listFont}'] text-2xl text-black`}>
+                    <span className={`font-${listFont}] text-2xl text-black`}>
                       {doubloons || "0"}
                     </span>
                   </div>
                 </div>
 
                 <div
-                  className={`font-['${signatureFont}'] absolute right-16 bottom-0 text-5xl text-black font-bold whitespace-pre-wrap`}
+                  className={`font-${signatureFont} absolute right-16 bottom-0 text-5xl text-black font-bold whitespace-pre-wrap`}
                   style={{
                     transform: "rotate(-4deg)",
                     textShadow: "1px 1px 2px rgba(0,0,0,0.1)",
@@ -167,7 +167,7 @@ export const LogPreview: React.FC = () => {
                 >
                   {signature || "Your Signature"}
                   {subtitle && (
-                    <div className={`font-['${subtitleFont}'] text-3xl mt-2 text-right`}>{subtitle}</div>
+                    <div className={`font-${subtitleFont} text-3xl mt-2 text-right`}>{subtitle}</div>
                   )}
                 </div>
               </div>
@@ -177,10 +177,10 @@ export const LogPreview: React.FC = () => {
           {isLastPage && mode === "skirmish" && (
             <div className="p-2">
               {/* Skirmish Layout */}
-              <h3 className={`font-['${headerFont}'] text-2xl text-black mb-2`}>
+              <h3 className={`font-${headerFont} text-2xl text-black mb-2`}>
                 Skirmish Dives
               </h3>
-              <div className={`font-['${listFont}'] text-xl text-black leading-relaxed p-2`}>
+              <div className={`font-${listFont} text-xl text-black leading-relaxed p-2`}>
                 {dives.length === 0 && (
                   <div>No dives recorded for this skirmish.</div>
                 )}
@@ -219,7 +219,7 @@ export const LogPreview: React.FC = () => {
               {/* Signature */}
               <div className="flex justify-end items-center mt-8">
                 <div
-                  className={`font-['${signatureFont}'] text-5xl text-black font-bold whitespace-pre-wrap`}
+                  className={`font-${signatureFont} text-5xl text-black font-bold whitespace-pre-wrap`}
                   style={{
                     transform: "rotate(-4deg)",
                     textShadow: "1px 1px 2px rgba(0,0,0,0.1)",
@@ -227,7 +227,7 @@ export const LogPreview: React.FC = () => {
                 >
                   {signature || "Your Signature"}
                   {subtitle && (
-                    <div className={`font-['${subtitleFont}'] text-3xl mt-2 text-right`}>{subtitle}</div>
+                    <div className={`font-${subtitleFont} text-3xl mt-2 text-right`}>{subtitle}</div>
                   )}
                 </div>
               </div>
