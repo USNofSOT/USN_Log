@@ -32,6 +32,10 @@ interface LogContextType {
   logBackground: string;
   activePageIndex: number;
   pages: string[];
+  signatureFont: string;
+  subtitleFont: string;
+  headerFont: string;
+  listFont: string;
 
   // Setters
   setMode: (mode: "patrol" | "skirmish") => void;
@@ -54,6 +58,10 @@ interface LogContextType {
   setLogIcon: (ship: ShipType) => void;
   setLogBackground: (background: string) => void;
   setActivePageIndex: (index: number) => void;
+  setSignatureFont: (font: string) => void;
+  setSubtitleFont: (font: string) => void;
+  setHeaderFont: (font: string) => void;
+  setListFont: (font: string) => void;
 
   // Actions
   addNewDive: () => void;

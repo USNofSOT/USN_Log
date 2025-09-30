@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { defaultFonts } from "../config/fonts";
 
 type DiveEntry = {
   ourTeam: "Athena" | "Reaper";
@@ -38,8 +39,12 @@ export function useLogState() {
   const [isCopyModalOpen, setIsCopyModalOpen] = useState(false);
 
   // Font choices
-  const [titleFont, setTitleFont] = useState("Satisfy");
-  const [bodyFont, setBodyFont] = useState("Indie_Flower");
+  const [titleFont, setTitleFont] = useState(defaultFonts.title);
+  const [bodyFont, setBodyFont] = useState(defaultFonts.body);
+  const [signatureFont, setSignatureFont] = useState(defaultFonts.signature);
+  const [subtitleFont, setSubtitleFont] = useState(defaultFonts.subtitle);
+  const [headerFont, setHeaderFont] = useState(defaultFonts.headers);
+  const [listFont, setListFont] = useState(defaultFonts.lists);
 
   // Log visuals
   const [logIcon, setLogIcon] = useState<ShipType>("usn");
@@ -74,6 +79,10 @@ export function useLogState() {
     const savedMainShip = localStorage.getItem("mainShip");
     const savedAuxiliaryShip = localStorage.getItem("auxiliaryShip");
     const savedVoyageNumber = localStorage.getItem("voyageNumber");
+    const savedSignatureFont = localStorage.getItem("signatureFont");
+    const savedSubtitleFont = localStorage.getItem("subtitleFont");
+    const savedHeaderFont = localStorage.getItem("headerFont");
+    const savedListFont = localStorage.getItem("listFont");
 
     if (savedTitle) setTitle(savedTitle);
     if (savedBody) setBody(savedBody);
@@ -91,6 +100,10 @@ export function useLogState() {
     if (savedMainShip) setMainShip(savedMainShip);
     if (savedAuxiliaryShip) setAuxiliaryShip(savedAuxiliaryShip);
     if (savedVoyageNumber) setVoyageNumber(savedVoyageNumber);
+    if (savedSignatureFont) setSignatureFont(savedSignatureFont);
+    if (savedSubtitleFont) setSubtitleFont(savedSubtitleFont);
+    if (savedHeaderFont) setHeaderFont(savedHeaderFont);
+    if (savedListFont) setListFont(savedListFont);
   }, []);
 
   // Helper: Debounce calls to localStorage
@@ -125,6 +138,10 @@ export function useLogState() {
       localStorage.setItem("mainShip", mainShip);
       localStorage.setItem("auxiliaryShip", auxiliaryShip);
       localStorage.setItem("voyageNumber", voyageNumber);
+      localStorage.setItem("signatureFont", signatureFont);
+      localStorage.setItem("subtitleFont", subtitleFont);
+      localStorage.setItem("headerFont", headerFont);
+      localStorage.setItem("listFont", listFont);
     };
     const debouncedSave = debounce(saveToLocalStorage, 500);
     debouncedSave();
@@ -146,6 +163,10 @@ export function useLogState() {
     mainShip,
     auxiliaryShip,
     voyageNumber,
+    signatureFont,
+    subtitleFont,
+    headerFont,
+    listFont,
   ]);
 
   // Pagination logic
@@ -376,6 +397,10 @@ export function useLogState() {
     isCopyModalOpen,
     titleFont,
     bodyFont,
+    signatureFont,
+    subtitleFont,
+    headerFont,
+    listFont,
     logIcon,
     logBackground,
     activePageIndex,
@@ -400,6 +425,10 @@ export function useLogState() {
     setIsCopyModalOpen,
     setTitleFont,
     setBodyFont,
+    setSignatureFont,
+    setSubtitleFont,
+    setHeaderFont,
+    setListFont,
     setLogIcon,
     setLogBackground,
     setActivePageIndex,
