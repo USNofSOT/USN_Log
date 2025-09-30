@@ -8,7 +8,7 @@ export const LogPreview: React.FC = () => {
     pages,
     activePageIndex,
     setActivePageIndex,
-    selectedShip,
+    logIcon,
     title,
     signature,
     subtitle,
@@ -47,23 +47,23 @@ export const LogPreview: React.FC = () => {
         }}
       >
         {/* Ship Logo */}
-          {selectedShip !== 'none' && (
-            <img
-              src={shipLogos[selectedShip]}
-              onError={(e) => {
-                e.currentTarget.src = "/USN_Log/log_icons/usn_logo.png";
-              }}
-              alt="Ship Logo"
-              crossOrigin="anonymous"
-              className="absolute inset-0 m-auto"
-              style={{
-                width: "50%",
-                height: "auto",
-                opacity: 0.3,
-                zIndex: 0,
-              }}
-            />
-          )}
+        {logIcon !== 'none' && (
+          <img
+            src={shipLogos[logIcon]}
+            onError={(e) => {
+              e.currentTarget.src = "/USN_Log/log_icons/usn_logo.png";
+            }}
+            alt="Ship Logo"
+            crossOrigin="anonymous"
+            className="absolute inset-0 m-auto"
+            style={{
+              width: "50%",
+              height: "auto",
+              opacity: 0.3,
+              zIndex: 0,
+            }}
+          />
+        )}
 
         <div
           id="writing-area"

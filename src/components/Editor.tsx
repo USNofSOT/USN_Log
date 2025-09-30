@@ -1,5 +1,5 @@
 import React from "react";
-import { Printer } from "lucide-react";
+import { Printer, SparklesIcon } from "lucide-react";
 import { useLog } from "../context/LogContext";
 import { ShipType } from "../hooks/useLogState";
 import { log_icons } from "../config/log_icons";
@@ -16,6 +16,12 @@ export const Editor: React.FC = () => {
     setSignature,
     subtitle,
     setSubtitle,
+    mainShip,
+    setMainShip,
+    auxiliaryShip,
+    setAuxiliaryShip,
+    voyageNumber,
+    setVoyageNumber,
     events,
     setEvents,
     crew,
@@ -36,30 +42,110 @@ export const Editor: React.FC = () => {
     setIsCopyModalOpen,
   } = useLog();
 
+
+function ordinal_suffix_of(i: number) {
+    let j = i % 10,
+        k = i % 100;
+    if (j === 1 && k !== 11) {
+        return i + "st";
+    }
+    if (j === 2 && k !== 12) {
+        return i + "nd";
+    }
+    if (j === 3 && k !== 13) {
+        return i + "rd";
+    }
+    return i + "th";
+}
+
+
   return (
     <div className="w-1/2 bg-[#2a2a2a] p-6 rounded-lg">
       <div className="space-y-4">
         {/* Mode Toggle */}
         <div>
           <label className="block text-sm font-medium mb-2">Mode</label>
-            <select
-              value={mode}
-              onChange={(e) => setMode(e.target.value as "patrol" | "skirmish")}
+          <select
+            value={mode}
+            onChange={(e) => setMode(e.target.value as "patrol" | "skirmish")}
+            className="w-full p-2 bg-[#3a3a3a] rounded border border-gray-600 text-white"
+          >
+            <option value="patrol">Patrol</option>
+            <option value="skirmish">Skirmish</option>
+          </select>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-2">Main Ship</label>
+            <input
+              type="text"
+              value={mainShip}
+              onChange={(e) => setMainShip(e.target.value)}
               className="w-full p-2 bg-[#3a3a3a] rounded border border-gray-600 text-white"
-            >
-              <option value="patrol">Patrol</option>
-              <option value="skirmish">Skirmish</option>
-            </select>
+              placeholder="USS Ship Name"
+            />
           </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2">
+              Auxiliary Ship
+            </label>
+            <input
+              type="text"
+              value={auxiliaryShip}
+              onChange={(e) => setAuxiliaryShip(e.target.value)}
+              className="w-full p-2 bg-[#3a3a3a] rounded border border-gray-600 text-white"
+              placeholder="USS Ship Name"
+            />
+          </div>
+        </div>
+
+        {/* Voyage Number */}
+        <div>
+          <label className="block text-sm font-medium mb-2">Voyage Number</label>
+          <input
+            type="number"
+            value={voyageNumber}
+            onChange={(e) => setVoyageNumber(e.target.value)}
+            className="w-full p-2 bg-[#3a3a3a] rounded border border-gray-600 text-white"
+            placeholder="Enter voyage number..."
+          />
+        </div>
 
         <div>
           <label className="block text-sm font-medium mb-2">Log Title</label>
-          <textarea
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="w-full p-2 bg-[#3a3a3a] rounded border border-gray-600 text-white h-16"
-            placeholder="Enter log title..."
-          />
+          <div className="flex flex-row">
+            <input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="w-full p-2 bg-[#3a3a3a] rounded border border-gray-600 text-white h-16"
+              placeholder="Enter log title..."
+            />
+              {mainShip && voyageNumber && (
+              (auxiliaryShip
+                ? title !== `Official ${mode.charAt(0).toUpperCase() + mode.slice(1)} Log of the ${ordinal_suffix_of(voyageNumber as unknown as number)}  Voyage of the ${auxiliaryShip}, auxiliary to the ${mainShip}.`
+                : title !== `Official ${mode.charAt(0).toUpperCase() + mode.slice(1)} Log of the ${ordinal_suffix_of(voyageNumber as unknown as number)} Voyage of the ${mainShip}.`
+              ) && (
+                <button
+                  onClick={() => {
+                    if (auxiliaryShip) {
+                    setTitle(
+                      `Official ${mode.charAt(0).toUpperCase() + mode.slice(1)} Log of the ${ordinal_suffix_of(voyageNumber as unknown as number)}  Voyage of the ${auxiliaryShip}, auxiliary to the ${mainShip}.`
+                    );
+                    } else {
+                    setTitle(
+                      `Official ${mode.charAt(0).toUpperCase() + mode.slice(1)} Log of the ${ordinal_suffix_of(voyageNumber as unknown as number)} Voyage of the ${mainShip}.`
+                    );
+                    }
+                  }}
+                  className="m-2 p-1 bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded"
+                >
+                  <SparklesIcon size={16} />
+                </button>
+              )
+              )}
+            </div>
         </div>
 
         <div>
@@ -266,13 +352,13 @@ export const Editor: React.FC = () => {
             Copy Discord Message
           </button>
         </div>
-            <button
-              onClick={() => setIsCopyModalOpen(true)}
-              className="mt-2 w-full bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded"
-              type="button"
-            >
-              Preview Discord Message
-          </button>
+        <button
+          onClick={() => setIsCopyModalOpen(true)}
+          className="mt-2 w-full bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded"
+          type="button"
+        >
+          Preview Discord Message
+        </button>
       </div>
     </div>
   );

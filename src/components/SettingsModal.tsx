@@ -12,11 +12,11 @@ export const SettingsModal: React.FC = () => {
     bodyFont,
     logBackground,
     setLogBackground,
-    selectedShip,
-    setSelectedShip,
     setTitleFont,
     setBodyFont,
     loadTestingData,
+    logIcon,
+    setLogIcon,
   } = useLog();
 
   const onClose = () => setIsModalOpen(false);
@@ -59,8 +59,8 @@ export const SettingsModal: React.FC = () => {
               </label>
             <select
               id="log-icon"
-              value={selectedShip}
-              onChange={(e) => setSelectedShip(e.target.value as ShipType)}
+              value={logIcon}
+              onChange={(e) => setLogIcon(e.target.value as ShipType)}
               className="w-full p-2 bg-gray-700 rounded border border-gray-600 text-white"
             >
               {log_icons.map(function(object, i){

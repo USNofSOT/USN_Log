@@ -17,7 +17,11 @@ export function useLogState() {
   const [body, setBody] = useState("");
   const [signature, setSignature] = useState("");
   const [subtitle, setSubtitle] = useState("");
-  const [selectedShip, setSelectedShip] = useState<ShipType>("audacious");
+
+  // New ship and voyage fields
+  const [mainShip, setMainShip] = useState("");
+  const [auxiliaryShip, setAuxiliaryShip] = useState("");
+  const [voyageNumber, setVoyageNumber] = useState("");
 
   // Patrol-specific fields
   const [events, setEvents] = useState("");
@@ -37,7 +41,8 @@ export function useLogState() {
   const [titleFont, setTitleFont] = useState("Satisfy");
   const [bodyFont, setBodyFont] = useState("Indie_Flower");
 
-  // Log background
+  // Log visuals
+  const [logIcon, setLogIcon] = useState<ShipType>("usn");
   const [logBackground, setLogBackground] = useState("Parchment");
 
   // For tabbing between preview pages
@@ -63,10 +68,12 @@ export function useLogState() {
     const savedDoubloons = localStorage.getItem("doubloons");
     const savedOurTeam = localStorage.getItem("ourTeam");
     const savedDives = localStorage.getItem("dives");
-    const savedSelectedShip = localStorage.getItem("selectedShip");
+    const savedLogIcon = localStorage.getItem("logIcon");
     const savedTitleFont = localStorage.getItem("titleFont");
     const savedBodyFont = localStorage.getItem("bodyFont");
-    const savedLogBackground = localStorage.getItem("logBackground");
+    const savedMainShip = localStorage.getItem("mainShip");
+    const savedAuxiliaryShip = localStorage.getItem("auxiliaryShip");
+    const savedVoyageNumber = localStorage.getItem("voyageNumber");
 
     if (savedTitle) setTitle(savedTitle);
     if (savedBody) setBody(savedBody);
@@ -78,10 +85,12 @@ export function useLogState() {
     if (savedDoubloons) setDoubloons(savedDoubloons);
     if (savedOurTeam) setOurTeam(savedOurTeam as "Athena" | "Reaper");
     if (savedDives) setDives(JSON.parse(savedDives));
-    if (savedSelectedShip) setSelectedShip(savedSelectedShip as ShipType);
+    if (savedLogIcon) setLogIcon(savedLogIcon as ShipType);
     if (savedTitleFont) setTitleFont(savedTitleFont);
     if (savedBodyFont) setBodyFont(savedBodyFont);
-    if (savedLogBackground) setLogBackground(savedLogBackground);
+    if (savedMainShip) setMainShip(savedMainShip);
+    if (savedAuxiliaryShip) setAuxiliaryShip(savedAuxiliaryShip);
+    if (savedVoyageNumber) setVoyageNumber(savedVoyageNumber);
   }, []);
 
   // Helper: Debounce calls to localStorage
@@ -110,10 +119,12 @@ export function useLogState() {
       localStorage.setItem("doubloons", doubloons);
       localStorage.setItem("ourTeam", ourTeam);
       localStorage.setItem("dives", JSON.stringify(dives));
-      localStorage.setItem("selectedShip", selectedShip);
+      localStorage.setItem("logIcon", logIcon);
       localStorage.setItem("titleFont", titleFont);
       localStorage.setItem("bodyFont", bodyFont);
-      localStorage.setItem("logBackground", logBackground);
+      localStorage.setItem("mainShip", mainShip);
+      localStorage.setItem("auxiliaryShip", auxiliaryShip);
+      localStorage.setItem("voyageNumber", voyageNumber);
     };
     const debouncedSave = debounce(saveToLocalStorage, 500);
     debouncedSave();
@@ -129,9 +140,12 @@ export function useLogState() {
     doubloons,
     ourTeam,
     dives,
-    selectedShip,
+    logIcon,
     titleFont,
     bodyFont,
+    mainShip,
+    auxiliaryShip,
+    voyageNumber,
   ]);
 
   // Pagination logic
@@ -349,7 +363,9 @@ export function useLogState() {
     body,
     signature,
     subtitle,
-    selectedShip,
+    mainShip,
+    auxiliaryShip,
+    voyageNumber,
     events,
     crew,
     gold,
@@ -360,6 +376,7 @@ export function useLogState() {
     isCopyModalOpen,
     titleFont,
     bodyFont,
+    logIcon,
     logBackground,
     activePageIndex,
     pages,
@@ -370,7 +387,9 @@ export function useLogState() {
     setBody,
     setSignature,
     setSubtitle,
-    setSelectedShip,
+    setMainShip,
+    setAuxiliaryShip,
+    setVoyageNumber,
     setEvents,
     setCrew,
     setGold,
@@ -381,6 +400,7 @@ export function useLogState() {
     setIsCopyModalOpen,
     setTitleFont,
     setBodyFont,
+    setLogIcon,
     setLogBackground,
     setActivePageIndex,
 

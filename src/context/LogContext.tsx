@@ -10,7 +10,10 @@ interface LogContextType {
   body: string;
   signature: string;
   subtitle: string;
-  selectedShip: ShipType;
+  logIcon: ShipType;
+  mainShip: string;
+  auxiliaryShip: string;
+  voyageNumber: string;
   events: string;
   crew: string;
   gold: string;
@@ -36,7 +39,9 @@ interface LogContextType {
   setBody: (body: string) => void;
   setSignature: (signature: string) => void;
   setSubtitle: (subtitle: string) => void;
-  setSelectedShip: (ship: ShipType) => void;
+  setMainShip: (ship: string) => void;
+  setAuxiliaryShip: (ship: string) => void;
+  setVoyageNumber: (voyageNumber: string) => void;
   setEvents: (events: string) => void;
   setCrew: (crew: string) => void;
   setGold: (gold: string) => void;
@@ -46,6 +51,7 @@ interface LogContextType {
   setIsCopyModalOpen: (isOpen: boolean) => void;
   setTitleFont: (font: string) => void;
   setBodyFont: (font: string) => void;
+  setLogIcon: (ship: ShipType) => void;
   setLogBackground: (background: string) => void;
   setActivePageIndex: (index: number) => void;
 
