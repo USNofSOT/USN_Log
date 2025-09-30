@@ -1,12 +1,12 @@
 export const spacingConfig = {
   padding: {
-    default: 48,
+    default: 96,
     min: 12,
     max: 96,
     unit: 'px'
   },
   margin: {
-    default: 32,
+    default: 0,
     min: 0,
     max: 64,
     unit: 'px'

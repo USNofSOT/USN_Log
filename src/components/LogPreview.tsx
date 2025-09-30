@@ -58,6 +58,7 @@ export const LogPreview: React.FC = () => {
           boxShadow: "0 0 20px rgba(0,0,0,0.3)",
           position: "relative",
           display: displayStyle,
+          padding: `${contentPadding}px`,
         }}
       >
         {/* Ship Logo */}
@@ -82,7 +83,12 @@ export const LogPreview: React.FC = () => {
         <div
           id="writing-area"
           className="h-full flex flex-col relative z-10"
-          style={{ padding: `${contentPadding}px` }}
+          style={{ 
+            marginLeft: `${contentMargin}px`,
+            marginRight: `${contentMargin}px`,
+            marginTop: `${contentMargin}px`,
+            marginBottom: `${contentMargin}px`
+           }}
         >
           {/* Conditional title rendering with dynamic spacing */}
           {(showTitleOnFirstPage ? isFirstPage : true) && (
@@ -90,10 +96,6 @@ export const LogPreview: React.FC = () => {
               className={`text-center font-${titleFont} text-black whitespace-pre-wrap`}
               style={{ 
                 fontSize: `${titleFontSize}px`,
-                marginLeft: `${contentMargin}px`,
-                marginRight: `${contentMargin}px`,
-                marginTop: `${contentMargin}px`,
-                marginBottom: `${contentMargin}px`
               }}
             >
               {title || "Log Title"}
@@ -105,7 +107,7 @@ export const LogPreview: React.FC = () => {
             className={`font-${bodyFont} flex-grow whitespace-pre-wrap text-black leading-relaxed`}
             style={{ 
               fontSize: `${bodyFontSize}px`,
-              padding: `${contentMargin / 2}px`
+              padding: '1rem'
             }}
           >
             {pageText || "Your log entry will appear here..."}
@@ -116,10 +118,6 @@ export const LogPreview: React.FC = () => {
               {(showExtrasOnLastPage ? isLastPage : true) && (
                 <div 
                   className="grid grid-cols-2 gap-8"
-                  style={{ 
-                    marginLeft: `${contentMargin}px`,
-                    marginTop: `${contentMargin}px`
-                  }}
                 >
                   {enableEvents && events && (
                     <div>
@@ -127,7 +125,6 @@ export const LogPreview: React.FC = () => {
                         className={`font-${headerFont} text-black`}
                         style={{ 
                           fontSize: `${headerFontSize}px`,
-                          marginBottom: `${contentMargin / 2}px`
                         }}
                       >
                         Notable Events
@@ -146,7 +143,6 @@ export const LogPreview: React.FC = () => {
                             key={i} 
                             style={{ 
                               breakInside: "avoid-column",
-                              marginBottom: `${contentMargin / 4}px`
                             }}
                           >
                             {ev}
@@ -162,7 +158,6 @@ export const LogPreview: React.FC = () => {
                         className={`font-${headerFont} text-black`}
                         style={{ 
                           fontSize: `${headerFontSize}px`,
-                          marginBottom: `${contentMargin / 2}px`
                         }}
                       >
                         Crew Manifest
@@ -181,7 +176,6 @@ export const LogPreview: React.FC = () => {
                             key={i} 
                             style={{ 
                               breakInside: "avoid-column",
-                              marginBottom: `${contentMargin / 4}px`
                             }}
                           >
                             {member}
@@ -197,7 +191,6 @@ export const LogPreview: React.FC = () => {
               <div className="flex justify-between items-end">
                 <div 
                   className="flex gap-8"
-                  style={{ paddingLeft: `${contentMargin}px` }}
                 >
                   <div className="flex pl-4 items-center gap-2">
                     <img
@@ -236,8 +229,6 @@ export const LogPreview: React.FC = () => {
                       fontSize: `${signatureFontSize}px`,
                       transform: "rotate(-4deg)",
                       textShadow: "1px 1px 2px rgba(0,0,0,0.1)",
-                      marginRight: `${contentMargin}px`,
-                      marginBottom: `${contentMargin}px`
                     }}
                   >
                     {signature || "Your Signature"}
@@ -253,12 +244,11 @@ export const LogPreview: React.FC = () => {
               {!showExtrasOnLastPage && mode === "patrol" && (
                 <>
                   {events && (
-                    <div style={{ marginTop: `${contentMargin}px` }}>
+                    <div>
                       <h3 
                         className={`font-${headerFont} text-black`}
                         style={{ 
                           fontSize: `${headerFontSize}px`,
-                          marginBottom: `${contentMargin / 2}px`
                         }}
                       >
                         Notable Events
@@ -270,7 +260,6 @@ export const LogPreview: React.FC = () => {
                         {formatList(events).map((ev, i) => (
                           <li 
                             key={i}
-                            style={{ marginBottom: `${contentMargin / 4}px` }}
                           >
                             {ev}
                           </li>
@@ -317,12 +306,11 @@ export const LogPreview: React.FC = () => {
 
           {/* Skirmish mode signature without subtitle */}
           {isLastPage && mode === "skirmish" && (
-            <div style={{ padding: `${contentMargin / 2}px` }}>
+            <div>
               <h3 
                 className={`font-${headerFont} text-black`}
                 style={{ 
                   fontSize: `${headerFontSize}px`,
-                  marginBottom: `${contentMargin / 2}px`
                 }}
               >
                 Skirmish Dives
@@ -331,7 +319,6 @@ export const LogPreview: React.FC = () => {
                 className={`font-${listFont} text-black leading-relaxed`}
                 style={{ 
                   fontSize: `${listFontSize}px`,
-                  padding: `${contentMargin / 2}px`
                 }}
               >
                 {dives.length === 0 && (
@@ -371,7 +358,6 @@ export const LogPreview: React.FC = () => {
 
               <div 
                 className="flex justify-end items-center"
-                style={{ marginTop: `${contentMargin}px` }}
               >
                 <div
                   className={`font-${signatureFont} text-black font-bold whitespace-pre-wrap`}

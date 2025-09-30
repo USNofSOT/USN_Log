@@ -12,7 +12,7 @@ export const fontSizeConfig = {
     unit: 'px'
   },
   signature: {
-    default: 48,
+    default: 27,
     min: 12,
     max: 72,
     unit: 'px'
