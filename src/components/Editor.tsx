@@ -12,8 +12,6 @@ export const Editor: React.FC = () => {
     setBody,
     signature,
     setSignature,
-    subtitle,
-    setSubtitle,
     mainShip,
     setMainShip,
     auxiliaryShip,
@@ -305,17 +303,6 @@ function ordinal_suffix_of(i: number) {
             onChange={(e) => setSignature(e.target.value)}
             className="w-full p-2 bg-[#3a3a3a] rounded border border-gray-600 text-white"
             rows={2}
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium mb-2">Subtitle</label>
-          <textarea
-            value={subtitle}
-            onChange={(e) => setSubtitle(e.target.value)}
-            className="w-full p-2 bg-[#3a3a3a] rounded border border-gray-600 text-white"
-            rows={2}
-            placeholder="Enter rank or custom subtitle..."
           />
         </div>
 

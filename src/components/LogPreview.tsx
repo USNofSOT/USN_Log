@@ -11,7 +11,11 @@ export const LogPreview: React.FC = () => {
     logIcon,
     title,
     signature,
-    subtitle,
+    headerFont,
+    listFont,
+    signatureFontSize,
+    headerFontSize,
+    listFontSize,
     mode,
     events,
     crew,
@@ -21,13 +25,14 @@ export const LogPreview: React.FC = () => {
     titleFont,
     bodyFont,
     signatureFont,
-    subtitleFont,
-    headerFont,
-    listFont,
     logBackground,
     formatList,
     showTitleOnFirstPage,
     showExtrasOnLastPage,
+    titleFontSize,
+    bodyFontSize,
+    contentPadding,
+    contentMargin,
   } = useLog();
   const shipLogos: Record<string, string> = log_icons.reduce((acc, icon) => {
     acc[icon.value] = icon.path;
@@ -74,19 +79,32 @@ export const LogPreview: React.FC = () => {
 
         <div
           id="writing-area"
-          className="p-12 h-full flex flex-col relative z-10"
+          className="h-full flex flex-col relative z-10"
+          style={{ padding: `${contentPadding}px` }}
         >
-          {/* Conditional title rendering */}
+          {/* Conditional title rendering with dynamic spacing */}
           {(showTitleOnFirstPage ? isFirstPage : true) && (
             <h2
-              className={`text-5xl text-center ml-16 mr-16 mt-12 mb-8 font-${titleFont} text-black whitespace-pre-wrap`}
+              className={`text-center font-${titleFont} text-black whitespace-pre-wrap`}
+              style={{ 
+                fontSize: `${titleFontSize}px`,
+                marginLeft: `${contentMargin}px`,
+                marginRight: `${contentMargin}px`,
+                marginTop: `${contentMargin}px`,
+                marginBottom: `${contentMargin}px`
+              }}
             >
               {title || "Log Title"}
             </h2>
           )}
 
+          {/* Body text with dynamic spacing */}
           <div
-            className={`font-${bodyFont} text-base flex-grow whitespace-pre-wrap text-black leading-relaxed p-2`}
+            className={`font-${bodyFont} flex-grow whitespace-pre-wrap text-black leading-relaxed`}
+            style={{ 
+              fontSize: `${bodyFontSize}px`,
+              padding: `${contentMargin / 2}px`
+            }}
           >
             {pageText || "Your log entry will appear here..."}
           </div>
@@ -94,22 +112,41 @@ export const LogPreview: React.FC = () => {
           {isLastPage && mode === "patrol" && (
             <>
               {(showExtrasOnLastPage ? isLastPage : true) && (
-                <div className="grid grid-cols-2 gap-8 ml-6 mt-4">
+                <div 
+                  className="grid grid-cols-2 gap-8"
+                  style={{ 
+                    marginLeft: `${contentMargin}px`,
+                    marginTop: `${contentMargin}px`
+                  }}
+                >
                   {events && (
                     <div>
-                      <h3 className={`font-${headerFont} text-2xl text-black mb-2`}>
+                      <h3 
+                        className={`font-${headerFont} text-black`}
+                        style={{ 
+                          fontSize: `${headerFontSize}px`,
+                          marginBottom: `${contentMargin / 2}px`
+                        }}
+                      >
                         Notable Events
                       </h3>
                       <ul
-                        className={`list-none font-${listFont} text-lg text-black`}
+                        className={`list-none font-${listFont} text-black`}
                         style={{
+                          fontSize: `${listFontSize}px`,
                           columns: "2",
                           columnGap: "1rem",
                           breakInside: "avoid-column",
                         }}
                       >
                         {formatList(events).map((ev, i) => (
-                          <li key={i} style={{ breakInside: "avoid-column" }}>
+                          <li 
+                            key={i} 
+                            style={{ 
+                              breakInside: "avoid-column",
+                              marginBottom: `${contentMargin / 4}px`
+                            }}
+                          >
                             {ev}
                           </li>
                         ))}
@@ -119,19 +156,32 @@ export const LogPreview: React.FC = () => {
 
                   {crew && (
                     <div>
-                      <h3 className={`font-${headerFont} text-2xl text-black mb-2`}>
+                      <h3 
+                        className={`font-${headerFont} text-black`}
+                        style={{ 
+                          fontSize: `${headerFontSize}px`,
+                          marginBottom: `${contentMargin / 2}px`
+                        }}
+                      >
                         Crew Manifest
                       </h3>
                       <ul
-                        className={`list-none font-${listFont} text-lg text-black`}
+                        className={`list-none font-${listFont} text-black`}
                         style={{
+                          fontSize: `${listFontSize}px`,
                           columns: "2",
                           columnGap: "1rem",
                           breakInside: "avoid-column",
                         }}
                       >
                         {formatList(crew).map((member, i) => (
-                          <li key={i} style={{ breakInside: "avoid-column" }}>
+                          <li 
+                            key={i} 
+                            style={{ 
+                              breakInside: "avoid-column",
+                              marginBottom: `${contentMargin / 4}px`
+                            }}
+                          >
                             {member}
                           </li>
                         ))}
@@ -143,7 +193,10 @@ export const LogPreview: React.FC = () => {
 
               {/* Gold + Doubloons + Signature */}
               <div className="flex justify-between items-end">
-                <div className="flex gap-8">
+                <div 
+                  className="flex gap-8"
+                  style={{ paddingLeft: `${contentMargin}px` }}
+                >
                   <div className="flex pl-4 items-center gap-2">
                     <img
                       src="/USN_Log/gold.webp"
@@ -151,7 +204,10 @@ export const LogPreview: React.FC = () => {
                       crossOrigin="anonymous"
                       className="w-8 h-8"
                     />
-                    <span className={`font-${listFont} text-2xl text-black`}>
+                    <span 
+                      className={`font-${listFont} text-black`}
+                      style={{ fontSize: `${listFontSize * 1.3}px` }}
+                    >
                       {gold || "0"}
                     </span>
                   </div>
@@ -162,7 +218,10 @@ export const LogPreview: React.FC = () => {
                       crossOrigin="anonymous"
                       className="w-8 h-8"
                     />
-                    <span className={`font-${listFont}] text-2xl text-black`}>
+                    <span 
+                      className={`font-${listFont} text-black`}
+                      style={{ fontSize: `${listFontSize * 1.3}px` }}
+                    >
                       {doubloons || "0"}
                     </span>
                   </div>
@@ -170,47 +229,66 @@ export const LogPreview: React.FC = () => {
 
                 {(showExtrasOnLastPage ? isLastPage : true) && (
                   <div
-                    className={`font-${signatureFont} absolute right-16 bottom-0 text-5xl text-black font-bold whitespace-pre-wrap`}
+                    className={`font-${signatureFont} absolute right-16 bottom-0 text-black font-bold whitespace-pre-wrap`}
                     style={{
+                      fontSize: `${signatureFontSize}px`,
                       transform: "rotate(-4deg)",
                       textShadow: "1px 1px 2px rgba(0,0,0,0.1)",
+                      marginRight: `${contentMargin}px`,
+                      marginBottom: `${contentMargin}px`
                     }}
                   >
                     {signature || "Your Signature"}
-                    {subtitle && (
-                      <div className={`font-${subtitleFont} text-3xl mt-2 text-right`}>{subtitle}</div>
-                    )}
                   </div>
                 )}
               </div>
             </>
           )}
 
+          {/* Handle non-last pages with signature without subtitle */}
           {!isLastPage && (
             <>
-
               {!showExtrasOnLastPage && mode === "patrol" && (
                 <>
                   {events && (
-                    <div className="mt-4">
-                      <h3 className={`font-${headerFont} text-2xl text-black mb-2`}>
+                    <div style={{ marginTop: `${contentMargin}px` }}>
+                      <h3 
+                        className={`font-${headerFont} text-black`}
+                        style={{ 
+                          fontSize: `${headerFontSize}px`,
+                          marginBottom: `${contentMargin / 2}px`
+                        }}
+                      >
                         Notable Events
                       </h3>
-                      <ul className={`list-none font-${listFont} text-lg text-black`}>
+                      <ul 
+                        className={`list-none font-${listFont} text-black`}
+                        style={{ fontSize: `${listFontSize}px` }}
+                      >
                         {formatList(events).map((ev, i) => (
-                          <li key={i}>{ev}</li>
+                          <li 
+                            key={i}
+                            style={{ marginBottom: `${contentMargin / 4}px` }}
+                          >
+                            {ev}
+                          </li>
                         ))}
                       </ul>
                     </div>
                   )}
 
-                  {/* Crew */}
                   {crew && (
                     <div className="mt-4">
-                      <h3 className={`font-${headerFont} text-2xl text-black mb-2`}>
+                      <h3 
+                        className={`font-${headerFont} text-black mb-2`}
+                        style={{ fontSize: `${headerFontSize}px` }}
+                      >
                         Crew Manifest
                       </h3>
-                      <ul className={`list-none font-${listFont} text-lg text-black`}>
+                      <ul 
+                        className={`list-none font-${listFont} text-black`}
+                        style={{ fontSize: `${listFontSize}px` }}
+                      >
                         {formatList(crew).map((member, i) => (
                           <li key={i}>{member}</li>
                         ))}
@@ -220,16 +298,14 @@ export const LogPreview: React.FC = () => {
 
                   <div className="flex justify-end mt-auto">
                     <div
-                      className={`font-${signatureFont} text-5xl text-black font-bold whitespace-pre-wrap`}
+                      className={`font-${signatureFont} text-black font-bold whitespace-pre-wrap`}
                       style={{
+                        fontSize: `${signatureFontSize}px`,
                         transform: "rotate(-4deg)",
                         textShadow: "1px 1px 2px rgba(0,0,0,0.1)",
                       }}
                     >
                       {signature || "Your Signature"}
-                      {subtitle && (
-                        <div className={`font-${subtitleFont} text-3xl mt-2 text-right`}>{subtitle}</div>
-                      )}
                     </div>
                   </div>
                 </>
@@ -237,13 +313,25 @@ export const LogPreview: React.FC = () => {
             </>
           )}
 
+          {/* Skirmish mode signature without subtitle */}
           {isLastPage && mode === "skirmish" && (
-            <div className="p-2">
-              {/* Skirmish Layout */}
-              <h3 className={`font-${headerFont} text-2xl text-black mb-2`}>
+            <div style={{ padding: `${contentMargin / 2}px` }}>
+              <h3 
+                className={`font-${headerFont} text-black`}
+                style={{ 
+                  fontSize: `${headerFontSize}px`,
+                  marginBottom: `${contentMargin / 2}px`
+                }}
+              >
                 Skirmish Dives
               </h3>
-              <div className={`font-${listFont} text-xl text-black leading-relaxed p-2`}>
+              <div 
+                className={`font-${listFont} text-black leading-relaxed`}
+                style={{ 
+                  fontSize: `${listFontSize}px`,
+                  padding: `${contentMargin / 2}px`
+                }}
+              >
                 {dives.length === 0 && (
                   <div>No dives recorded for this skirmish.</div>
                 )}
@@ -279,19 +367,19 @@ export const LogPreview: React.FC = () => {
                 </div>
               </div>
 
-              {/* Signature */}
-              <div className="flex justify-end items-center mt-8">
+              <div 
+                className="flex justify-end items-center"
+                style={{ marginTop: `${contentMargin}px` }}
+              >
                 <div
-                  className={`font-${signatureFont} text-5xl text-black font-bold whitespace-pre-wrap`}
+                  className={`font-${signatureFont} text-black font-bold whitespace-pre-wrap`}
                   style={{
+                    fontSize: `${signatureFontSize}px`,
                     transform: "rotate(-4deg)",
                     textShadow: "1px 1px 2px rgba(0,0,0,0.1)",
                   }}
                 >
                   {signature || "Your Signature"}
-                  {subtitle && (
-                    <div className={`font-${subtitleFont} text-3xl mt-2 text-right`}>{subtitle}</div>
-                  )}
                 </div>
               </div>
             </div>

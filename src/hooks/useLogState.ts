@@ -1,5 +1,8 @@
 import { useState, useEffect } from "react";
 import { defaultFonts } from "../config/fonts";
+import { defaultFontSizes } from "../config/fontSizes";
+import { defaultSpacing } from "../config/spacing";
+import { appearanceDefaults } from "../config/appearance";
 
 type DiveEntry = {
   ourTeam: "Athena" | "Reaper";
@@ -17,7 +20,6 @@ export function useLogState() {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [signature, setSignature] = useState("");
-  const [subtitle, setSubtitle] = useState("");
 
   // New ship and voyage fields
   const [mainShip, setMainShip] = useState("");
@@ -42,13 +44,23 @@ export function useLogState() {
   const [titleFont, setTitleFont] = useState(defaultFonts.title);
   const [bodyFont, setBodyFont] = useState(defaultFonts.body);
   const [signatureFont, setSignatureFont] = useState(defaultFonts.signature);
-  const [subtitleFont, setSubtitleFont] = useState(defaultFonts.subtitle);
   const [headerFont, setHeaderFont] = useState(defaultFonts.headers);
   const [listFont, setListFont] = useState(defaultFonts.lists);
 
+  // Font sizes
+  const [titleFontSize, setTitleFontSize] = useState(defaultFontSizes.title);
+  const [bodyFontSize, setBodyFontSize] = useState(defaultFontSizes.body);
+  const [signatureFontSize, setSignatureFontSize] = useState(defaultFonts.signature);
+  const [headerFontSize, setHeaderFontSize] = useState(defaultFontSizes.headers);
+  const [listFontSize, setListFontSize] = useState(defaultFontSizes.lists);
+
+  // Spacing
+  const [contentPadding, setContentPadding] = useState(defaultSpacing.padding);
+  const [contentMargin, setContentMargin] = useState(defaultSpacing.margin);
+
   // Log visuals
-  const [logIcon, setLogIcon] = useState<ShipType>("usn");
-  const [logBackground, setLogBackground] = useState("Parchment");
+  const [logIcon, setLogIcon] = useState<ShipType>(appearanceDefaults.logIcon);
+  const [logBackground, setLogBackground] = useState(appearanceDefaults.logBackground);
 
   // For tabbing between preview pages
   const [activePageIndex, setActivePageIndex] = useState(0);
@@ -73,7 +85,6 @@ export function useLogState() {
     const savedTitle = localStorage.getItem("title");
     const savedBody = localStorage.getItem("body");
     const savedSignature = localStorage.getItem("signature");
-    const savedSubtitle = localStorage.getItem("subtitle");
     const savedEvents = localStorage.getItem("events");
     const savedCrew = localStorage.getItem("crew");
     const savedGold = localStorage.getItem("gold");
@@ -87,7 +98,6 @@ export function useLogState() {
     const savedAuxiliaryShip = localStorage.getItem("auxiliaryShip");
     const savedVoyageNumber = localStorage.getItem("voyageNumber");
     const savedSignatureFont = localStorage.getItem("signatureFont");
-    const savedSubtitleFont = localStorage.getItem("subtitleFont");
     const savedHeaderFont = localStorage.getItem("headerFont");
     const savedListFont = localStorage.getItem("listFont");
     const savedShowEventsOnLastPage = localStorage.getItem("showEventsOnLastPage");
@@ -96,10 +106,18 @@ export function useLogState() {
     const savedShowTitleOnFirstPage = localStorage.getItem("showTitleOnFirstPage");
     const savedShowExtrasOnLastPage = localStorage.getItem("showExtrasOnLastPage");
 
+    const savedTitleFontSize = localStorage.getItem("titleFontSize");
+    const savedBodyFontSize = localStorage.getItem("bodyFontSize");
+    const savedSignatureFontSize = localStorage.getItem("signatureFontSize");
+    const savedHeaderFontSize = localStorage.getItem("headerFontSize");
+    const savedListFontSize = localStorage.getItem("listFontSize");
+
+    const savedContentPadding = localStorage.getItem("contentPadding");
+    const savedContentMargin = localStorage.getItem("contentMargin");
+
     if (savedTitle) setTitle(savedTitle);
     if (savedBody) setBody(savedBody);
     if (savedSignature) setSignature(savedSignature);
-    if (savedSubtitle) setSubtitle(savedSubtitle);
     if (savedEvents) setEvents(savedEvents);
     if (savedCrew) setCrew(savedCrew);
     if (savedGold) setGold(savedGold);
@@ -113,7 +131,6 @@ export function useLogState() {
     if (savedAuxiliaryShip) setAuxiliaryShip(savedAuxiliaryShip);
     if (savedVoyageNumber) setVoyageNumber(savedVoyageNumber);
     if (savedSignatureFont) setSignatureFont(savedSignatureFont);
-    if (savedSubtitleFont) setSubtitleFont(savedSubtitleFont);
     if (savedHeaderFont) setHeaderFont(savedHeaderFont);
     if (savedListFont) setListFont(savedListFont);
     if (savedShowEventsOnLastPage !== null) setShowEventsOnLastPage(savedShowEventsOnLastPage === "true");
@@ -121,6 +138,13 @@ export function useLogState() {
     if (savedShowSignatureOnLastPage !== null) setShowSignatureOnLastPage(savedShowSignatureOnLastPage === "true");
     if (savedShowTitleOnFirstPage !== null) setShowTitleOnFirstPage(savedShowTitleOnFirstPage === "true");
     if (savedShowExtrasOnLastPage !== null) setShowExtrasOnLastPage(savedShowExtrasOnLastPage === "true");
+    if (savedTitleFontSize) setTitleFontSize(parseInt(savedTitleFontSize));
+    if (savedBodyFontSize) setBodyFontSize(parseInt(savedBodyFontSize));
+    if (savedSignatureFontSize) setSignatureFontSize(parseInt(savedSignatureFontSize));
+    if (savedHeaderFontSize) setHeaderFontSize(parseInt(savedHeaderFontSize));
+    if (savedListFontSize) setListFontSize(parseInt(savedListFontSize));
+    if (savedContentPadding) setContentPadding(parseInt(savedContentPadding));
+    if (savedContentMargin) setContentMargin(parseInt(savedContentMargin));
   }, []);
 
   // Helper: Debounce calls to localStorage
@@ -142,21 +166,18 @@ export function useLogState() {
       localStorage.setItem("title", title);
       localStorage.setItem("body", body);
       localStorage.setItem("signature", signature);
-      localStorage.setItem("subtitle", subtitle);
       localStorage.setItem("events", events);
       localStorage.setItem("crew", crew);
       localStorage.setItem("gold", gold);
       localStorage.setItem("doubloons", doubloons);
       localStorage.setItem("ourTeam", ourTeam);
       localStorage.setItem("dives", JSON.stringify(dives));
-      localStorage.setItem("logIcon", logIcon);
-      localStorage.setItem("titleFont", titleFont);
+      localStorage.setItem("logIcon", titleFont);
       localStorage.setItem("bodyFont", bodyFont);
       localStorage.setItem("mainShip", mainShip);
       localStorage.setItem("auxiliaryShip", auxiliaryShip);
       localStorage.setItem("voyageNumber", voyageNumber);
       localStorage.setItem("signatureFont", signatureFont);
-      localStorage.setItem("subtitleFont", subtitleFont);
       localStorage.setItem("headerFont", headerFont);
       localStorage.setItem("listFont", listFont);
       localStorage.setItem("showEventsOnLastPage", showEventsOnLastPage.toString());
@@ -164,6 +185,13 @@ export function useLogState() {
       localStorage.setItem("showSignatureOnLastPage", showSignatureOnLastPage.toString());
       localStorage.setItem("showTitleOnFirstPage", showTitleOnFirstPage.toString());
       localStorage.setItem("showExtrasOnLastPage", showExtrasOnLastPage.toString());
+      localStorage.setItem("titleFontSize", titleFontSize.toString());
+      localStorage.setItem("bodyFontSize", bodyFontSize.toString());
+      localStorage.setItem("signatureFontSize", signatureFontSize.toString());
+      localStorage.setItem("headerFontSize", headerFontSize.toString());
+      localStorage.setItem("listFontSize", listFontSize.toString());
+      localStorage.setItem("contentPadding", contentPadding.toString());
+      localStorage.setItem("contentMargin", contentMargin.toString());
     };
     const debouncedSave = debounce(saveToLocalStorage, 500);
     debouncedSave();
@@ -172,21 +200,18 @@ export function useLogState() {
     title,
     body,
     signature,
-    subtitle,
     events,
     crew,
     gold,
     doubloons,
     ourTeam,
     dives,
-    logIcon,
     titleFont,
     bodyFont,
     mainShip,
     auxiliaryShip,
     voyageNumber,
     signatureFont,
-    subtitleFont,
     headerFont,
     listFont,
     showEventsOnLastPage,
@@ -194,6 +219,13 @@ export function useLogState() {
     showSignatureOnLastPage,
     ,
     showExtrasOnLastPage,
+    titleFontSize,
+    bodyFontSize,
+    signatureFontSize,
+    headerFontSize,
+    listFontSize,
+    contentPadding,
+    contentMargin,
   ]);
 
   // Pagination logic
@@ -280,7 +312,6 @@ export function useLogState() {
     setTitle("");
     setBody("");
     setSignature("");
-    setSubtitle("");
     setEvents("");
     setCrew("");
     setGold("");
@@ -300,7 +331,6 @@ export function useLogState() {
       setCrew("Crew 1\nCrew 2\nCrew 3");
       setGold("1000");
       setDoubloons("300");
-      setSubtitle("Test Subtitle");
     } else {
       setTitle("Test Skirmish Title");
       setBody("Skirmish details here...");
@@ -320,7 +350,6 @@ export function useLogState() {
           notes: "Second match, big win",
         },
       ]);
-      setSubtitle("Skirmish Leader");
     }
   };
 
@@ -350,7 +379,6 @@ export function useLogState() {
         "",
         "Signed:",
         signature || "Your Signature",
-        subtitle || "",
       ].filter(Boolean);
       return sections.join("\n");
     };
@@ -410,7 +438,6 @@ export function useLogState() {
     title,
     body,
     signature,
-    subtitle,
     mainShip,
     auxiliaryShip,
     voyageNumber,
@@ -425,7 +452,6 @@ export function useLogState() {
     titleFont,
     bodyFont,
     signatureFont,
-    subtitleFont,
     headerFont,
     listFont,
     logIcon,
@@ -437,13 +463,19 @@ export function useLogState() {
     showSignatureOnLastPage,
     showTitleOnFirstPage,
     showExtrasOnLastPage,
+    titleFontSize,
+    bodyFontSize,
+    signatureFontSize,
+    headerFontSize,
+    listFontSize,
+    contentPadding,
+    contentMargin,
 
     // Setters
     setMode,
     setTitle,
     setBody,
     setSignature,
-    setSubtitle,
     setMainShip,
     setAuxiliaryShip,
     setVoyageNumber,
@@ -458,7 +490,6 @@ export function useLogState() {
     setTitleFont,
     setBodyFont,
     setSignatureFont,
-    setSubtitleFont,
     setHeaderFont,
     setListFont,
     setLogIcon,
@@ -469,6 +500,13 @@ export function useLogState() {
     setShowSignatureOnLastPage,
     setShowTitleOnFirstPage,
     setShowExtrasOnLastPage,
+    setTitleFontSize,
+    setBodyFontSize,
+    setSignatureFontSize,
+    setHeaderFontSize,
+    setListFontSize,
+    setContentPadding,
+    setContentMargin,
 
     // Actions
     addNewDive,

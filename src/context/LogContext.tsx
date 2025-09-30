@@ -9,7 +9,6 @@ interface LogContextType {
   title: string;
   body: string;
   signature: string;
-  subtitle: string;
   logIcon: ShipType;
   mainShip: string;
   auxiliaryShip: string;
@@ -33,19 +32,24 @@ interface LogContextType {
   activePageIndex: number;
   pages: string[];
   signatureFont: string;
-  subtitleFont: string;
   headerFont: string;
   listFont: string;
   showSignatureOnLastPage: boolean;
   showTitleOnFirstPage: boolean;
   showExtrasOnLastPage: boolean;
+  titleFontSize: number;
+  bodyFontSize: number;
+  signatureFontSize: number;
+  headerFontSize: number;
+  listFontSize: number;
+  contentPadding: number;
+  contentMargin: number;
 
   // Setters
   setMode: (mode: "patrol" | "skirmish") => void;
   setTitle: (title: string) => void;
   setBody: (body: string) => void;
   setSignature: (signature: string) => void;
-  setSubtitle: (subtitle: string) => void;
   setMainShip: (ship: string) => void;
   setAuxiliaryShip: (ship: string) => void;
   setVoyageNumber: (voyageNumber: string) => void;
@@ -62,12 +66,18 @@ interface LogContextType {
   setLogBackground: (background: string) => void;
   setActivePageIndex: (index: number) => void;
   setSignatureFont: (font: string) => void;
-  setSubtitleFont: (font: string) => void;
   setHeaderFont: (font: string) => void;
   setListFont: (font: string) => void;
   setShowSignatureOnLastPage: (show: boolean) => void;
   setShowTitleOnFirstPage: (show: boolean) => void;
   setShowExtrasOnLastPage: (show: boolean) => void;
+  setTitleFontSize: (size: number) => void;
+  setBodyFontSize: (size: number) => void;
+  setSignatureFontSize: (size: number) => void;
+  setHeaderFontSize: (size: number) => void;
+  setListFontSize: (size: number) => void;
+  setContentPadding: (padding: number) => void;
+  setContentMargin: (margin: number) => void;
 
   // Actions
   addNewDive: () => void;
