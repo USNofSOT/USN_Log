@@ -3,4 +3,8 @@ export const log_backgrounds = {
     name: "Parchment",
     path: "log_background/parchment.png",
   },
+  Blank: {
+    name: "Blank",
+    path: "log_background/blank.png",
+  },
 }
