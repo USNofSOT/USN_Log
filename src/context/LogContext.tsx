@@ -1,8 +1,7 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext } from "react";
 import { useLogState } from "../hooks/useLogState";
 import { useExport } from "../hooks/useExport";
 import { ShipType } from "../hooks/useLogState";
-import { defaultDiscordFormat, defaultImageFormat } from "../config/formats";
 
 interface LogContextType {
   // State
@@ -27,6 +26,7 @@ interface LogContextType {
   }>;
   isModalOpen: boolean;
   isCopyModalOpen: boolean;
+  previewMode: "image" | "discord";
   titleFont: string;
   bodyFont: string;
   logBackground: string;
@@ -87,6 +87,7 @@ interface LogContextType {
   setEnableCrew: (enabled: boolean) => void;
   setDiscordFormat: (format: string) => void;
   setImageFormat: (format: string) => void;
+  setPreviewMode: (mode: "image" | "discord") => void;
 
   // Actions
   addNewDive: () => void;

@@ -35,6 +35,8 @@ export const LogPreview: React.FC = () => {
     contentMargin,
     enableEvents,
     enableCrew,
+    previewMode,
+    formatDiscordMessage,
   } = useLog();
   const shipLogos: Record<string, string> = log_icons.reduce((acc, icon) => {
     acc[icon.value] = icon.path;
@@ -376,6 +378,22 @@ export const LogPreview: React.FC = () => {
       </div>
     );
   };
+
+  if (previewMode === "discord") {
+    return (
+      <div className="w-1/2" data-testid="log-preview">
+        <div className="bg-[#2a2a2a] p-6 rounded-lg shadow-lg">
+          <h2 className="text-2xl font-bold mb-4 text-white">Discord Message Preview</h2>
+          <textarea
+            className="w-full p-4 bg-[#3a3a3a] rounded border border-gray-600 text-white font-mono text-sm leading-relaxed resize-none"
+            value={formatDiscordMessage()}
+            readOnly
+            style={{ height: "600px" }}
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-1/2" data-testid="log-preview">

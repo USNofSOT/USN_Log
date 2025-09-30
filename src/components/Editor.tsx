@@ -36,6 +36,8 @@ export const Editor: React.FC = () => {
     generateImages,
     resetState,
     setIsCopyModalOpen,
+    previewMode,
+    setPreviewMode,
   } = useLog();
 
 
@@ -58,6 +60,33 @@ function ordinal_suffix_of(i: number) {
   return (
     <div className="w-1/2 bg-[#2a2a2a] p-6 rounded-lg">
       <div className="space-y-4">
+        {/* Preview Mode Toggle */}
+        <div>
+          <label className="block text-sm font-medium mb-2">Preview Mode</label>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setPreviewMode("image")}
+              className={`px-4 py-2 rounded font-medium ${
+                previewMode === "image"
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-600 text-gray-300 hover:bg-gray-500"
+              }`}
+            >
+              Image Preview
+            </button>
+            <button
+              onClick={() => setPreviewMode("discord")}
+              className={`px-4 py-2 rounded font-medium ${
+                previewMode === "discord"
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-600 text-gray-300 hover:bg-gray-500"
+              }`}
+            >
+              Discord Message
+            </button>
+          </div>
+        </div>
+
         {/* Mode Toggle */}
         <div>
           <label className="block text-sm font-medium mb-2">Mode</label>
@@ -337,13 +366,6 @@ function ordinal_suffix_of(i: number) {
             Copy Discord Message
           </button>
         </div>
-        <button
-          onClick={() => setIsCopyModalOpen(true)}
-          className="mt-2 w-full bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded"
-          type="button"
-        >
-          Preview Discord Message
-        </button>
       </div>
     </div>
   );

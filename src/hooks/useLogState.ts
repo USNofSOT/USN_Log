@@ -82,6 +82,9 @@ export function useLogState() {
   const [discordFormat, setDiscordFormat] = useState(defaultDiscordFormat);
   const [imageFormat, setImageFormat] = useState(defaultImageFormat);
 
+  // Preview mode
+  const [previewMode, setPreviewMode] = useState<"image" | "discord">("image");
+
   // -----------------------------------
   // Load from localStorage on mount
   // -----------------------------------
@@ -512,6 +515,7 @@ export function useLogState() {
     enableCrew,
     discordFormat,
     imageFormat,
+    previewMode,
 
     // Setters
     setMode,
@@ -553,6 +557,7 @@ export function useLogState() {
     setEnableCrew,
     setDiscordFormat,
     setImageFormat,
+    setPreviewMode,
 
     // Actions
     addNewDive,
