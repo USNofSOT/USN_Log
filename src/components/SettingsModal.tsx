@@ -360,7 +360,7 @@ export const SettingsModal: React.FC = () => {
                       <option key={key} value={key}>{format.name}</option>
                     ))}
                   </select>
-                  <p className="text-xs text-gray-500 mt-1">Format for Discord output</p>
+                  <p className="text-xs text-gray-500 mt-1">{discordFormats[discordFormat as keyof typeof discordFormats]?.description || "Format for Discord output"}</p>
                 </div>
 
                 <div>

@@ -1,6 +1,7 @@
 import React from "react";
 import { Printer, SparklesIcon } from "lucide-react";
 import { useLog } from "../context/LogContext";
+import { discordFormats } from "../config/formats";
 
 export const Editor: React.FC = () => {
   const {
@@ -38,6 +39,7 @@ export const Editor: React.FC = () => {
     setIsCopyModalOpen,
     previewMode,
     setPreviewMode,
+    discordFormat,
   } = useLog();
 
 
@@ -85,6 +87,11 @@ function ordinal_suffix_of(i: number) {
               Discord Message
             </button>
           </div>
+          {previewMode === "discord" && (
+            <p className="text-xs text-gray-400 mt-1">
+              Using: {discordFormats[discordFormat as keyof typeof discordFormats]?.name || discordFormat}
+            </p>
+          )}
         </div>
 
         {/* Mode Toggle */}

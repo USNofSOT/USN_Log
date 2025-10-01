@@ -4,6 +4,8 @@ import { defaultFontSizes } from "../config/fontSizes";
 import { defaultSpacing } from "../config/spacing";
 import { appearanceDefaults } from "../config/appearance";
 import { defaultDiscordFormat, defaultImageFormat } from "../config/formats";
+import { DiscordFormatFactory } from "../strategies/DiscordFormatFactory";
+import type { DiscordFormatData } from "../strategies/DiscordFormatStrategy";
 
 type DiveEntry = {
   ourTeam: "Athena" | "Reaper";
@@ -395,82 +397,23 @@ export function useLogState() {
 
   // Discord message formatting
   const formatDiscordMessage = () => {
-    // Common sections that appear in both modes
-    const formatCommonSections = () => {
-      const sections = [
-        title || "Title here",
-        "",
-        body ||
-          (mode === "patrol" ? "Patrol details here" : "Skirmish details here"),
-        "",
-      ];
-      return sections.join("\n");
+    const formatData: DiscordFormatData = {
+      mode,
+      title,
+      body,
+      signature,
+      events,
+      crew,
+      gold,
+      doubloons,
+      ourTeam,
+      dives,
+      enableEvents,
+      enableCrew,
     };
 
-    // Format the signature block that appears at the end
-    const formatSignature = () => {
-      const sections = [
-        "",
-        "Signed:",
-        signature || "Your Signature",
-      ].filter(Boolean);
-      return sections.join("\n");
-    };
-
-    // Format patrol-specific content
-    const formatPatrolContent = () => {
-      const sections = [];
-      
-      if (enableEvents) {
-        sections.push("Events:");
-        sections.push(events || "N/A");
-        sections.push("");
-      }
-      
-      sections.push(`Gold: ${gold || "0"}`);
-      sections.push(`Doubloons: ${doubloons || "0"}`);
-      sections.push("");
-      
-      if (enableCrew) {
-        sections.push("Crew:");
-        sections.push(crew || "N/A");
-      }
-      
-      return sections.join("\n");
-    };
-
-    // Format skirmish-specific content
-    const formatSkirmishContent = () => {
-      const formatTeamEmoji = (team: "Athena" | "Reaper") =>
-        `${team} ${team === "Athena" ? ":Athena:" : ":Reaper:"}`;
-
-      const formatDive = (dive: DiveEntry, index: number) => {
-        const vs = `${formatTeamEmoji(dive.ourTeam)} vs. ${formatTeamEmoji(
-          dive.enemyTeam
-        )}`;
-        const notes = dive.notes ? ` - ${dive.notes}` : "";
-        return `${index + 1}. ${vs} [${dive.outcome}]${notes}`;
-      };
-
-      const sections = [
-        `Team: ${ourTeam || "Athena"}`,
-        "",
-        "Dives:",
-        dives.length
-          ? dives.map((d, i) => formatDive(d, i)).join("\n")
-          : "No dives yet",
-      ];
-      return sections.join("\n");
-    };
-
-    // Combine all sections based on mode
-    const content = [
-      formatCommonSections(),
-      mode === "patrol" ? formatPatrolContent() : formatSkirmishContent(),
-      formatSignature(),
-    ].join("\n");
-
-    return content.trim();
+    const strategy = DiscordFormatFactory.getStrategy(discordFormat);
+    return strategy.formatMessage(formatData);
   };
 
   return {
