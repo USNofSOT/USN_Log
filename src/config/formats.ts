@@ -1,11 +1,11 @@
 export const discordFormats = {
     Standard: {
         name: "Standard",
-        description: "The classic format created by Randy - Clean and simple structure"
+        description: "The classic format created by Randy"
     },
     Trigs: {
         name: "Trig's Format",
-        description: "A unique format created by Trig - Enhanced with formatting and emojis"
+        description: "A unique format created by Trig"
     },
 };
 

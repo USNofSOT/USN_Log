@@ -73,6 +73,57 @@ export const SettingsModal: React.FC = () => {
           </button>
         </div>
 
+        {/* Format Settings */}
+        <div className="mb-8">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-xl font-semibold text-orange-400">Format Settings</h3>
+            <button
+              onClick={() => {
+                if (window.confirm("Are you sure you want to reset format settings to default values?")) {
+                  setDiscordFormat(defaultDiscordFormat);
+                  setImageFormat(defaultImageFormat);
+                }
+              }}
+              className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-3 rounded flex items-center gap-2"
+              title="Reset formats to defaults"
+            >
+              <RepeatIcon size={16} />
+              Reset Formats
+            </button>
+          </div>
+          <div className="bg-[#3a3a3a] p-4 rounded-lg">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">Discord Format</label>
+                <select
+                  value={discordFormat}
+                  onChange={(e) => setDiscordFormat(e.target.value)}
+                  className="w-full p-2 bg-gray-700 rounded border border-gray-600 text-white focus:border-blue-500"
+                >
+                  {Object.entries(discordFormats).map(([key, format]) => (
+                    <option key={key} value={key}>{format.name}</option>
+                  ))}
+                </select>
+                <p className="text-xs text-gray-500 mt-1">{discordFormats[discordFormat as keyof typeof discordFormats]?.description || "Format for Discord output"}</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">Image Format</label>
+                <select
+                  value={imageFormat}
+                  onChange={(e) => setImageFormat(e.target.value)}
+                  className="w-full p-2 bg-gray-700 rounded border border-gray-600 text-white focus:border-blue-500"
+                >
+                  {Object.entries(imageFormats).map(([key, format]) => (
+                    <option key={key} value={key}>{format.name}</option>
+                  ))}
+                </select>
+                <p className="text-xs text-gray-500 mt-1">{imageFormats[imageFormat as keyof typeof imageFormats]?.description || "Format for image generation"}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div className="mb-8">
           <h3 className="text-xl font-semibold mb-4 text-blue-400">Display Options</h3>
           <div className="bg-[#3a3a3a] p-4 rounded-lg">
@@ -304,8 +355,6 @@ export const SettingsModal: React.FC = () => {
                   setContentMargin(defaultSpacing.margin);
                   setLogBackground(appearanceDefaults.logBackground);
                   setLogIcon(appearanceDefaults.logIcon);
-                  setDiscordFormat(defaultDiscordFormat);
-                  setImageFormat(defaultImageFormat);
                 }
               }}
               className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-3 rounded flex items-center gap-2"
@@ -344,37 +393,6 @@ export const SettingsModal: React.FC = () => {
                       <option value={icon.value} key={i}>{icon.name}</option>
                     ))}
                   </select>
-                </div>
-              </div>
-              
-              {/* Format Settings */}
-              <div className="grid grid-cols-2 gap-4 mt-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Discord Format</label>
-                  <select
-                    value={discordFormat}
-                    onChange={(e) => setDiscordFormat(e.target.value)}
-                    className="w-full p-2 bg-gray-700 rounded border border-gray-600 text-white focus:border-blue-500"
-                  >
-                    {Object.entries(discordFormats).map(([key, format]) => (
-                      <option key={key} value={key}>{format.name}</option>
-                    ))}
-                  </select>
-                  <p className="text-xs text-gray-500 mt-1">{discordFormats[discordFormat as keyof typeof discordFormats]?.description || "Format for Discord output"}</p>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-2">Image Format</label>
-                  <select
-                    value={imageFormat}
-                    onChange={(e) => setImageFormat(e.target.value)}
-                    className="w-full p-2 bg-gray-700 rounded border border-gray-600 text-white focus:border-blue-500"
-                  >
-                    {Object.entries(imageFormats).map(([key, format]) => (
-                      <option key={key} value={key}>{format.name}</option>
-                    ))}
-                  </select>
-                  <p className="text-xs text-gray-500 mt-1">Format for image generation</p>
                 </div>
               </div>
             </div>

@@ -44,12 +44,12 @@ export class TrigsDiscordFormat implements DiscordFormatStrategy {
       crewList.forEach(member => {
         sections.push(`${member}`);
       });
-      sections.push("");
     }
     
-    if (data.notes) {
-      sections.push("**CO Notes:**");
-      sections.push(data.notes);
+    if (data.signature) {
+      sections.push("");
+      sections.push(`**CO Notes:**`);
+      sections.push(data.signature);
     }
     
     return sections.join("\n");

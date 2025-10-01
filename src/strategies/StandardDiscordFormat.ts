@@ -23,10 +23,6 @@ export class StandardDiscordFormat implements DiscordFormatStrategy {
 
     const formatPatrolContent = () => {
       const sections = [
-        data.title || "Patrol Log",
-        "",
-        data.body || "Patrol details here",
-        ""
       ];
 
       if (data.enableEvents && data.events) {
@@ -59,9 +55,6 @@ export class StandardDiscordFormat implements DiscordFormatStrategy {
       };
 
       const sections = [
-        data.title || "Skirmish Log",
-        "",
-        data.body || "Skirmish details here",
         "",
         `Team: ${data.ourTeam || "Athena"}`,
         "",
