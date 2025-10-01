@@ -22,21 +22,27 @@ export class StandardDiscordFormat implements DiscordFormatStrategy {
     };
 
     const formatPatrolContent = () => {
-      const sections = [];
-      
-      if (data.enableEvents) {
+      const sections = [
+        data.title || "Patrol Log",
+        "",
+        data.body || "Patrol details here",
+        ""
+      ];
+
+      if (data.enableEvents && data.events) {
         sections.push("Events:");
-        sections.push(data.events || "N/A");
+        sections.push(data.events);
         sections.push("");
       }
-      
+
       sections.push(`Gold: ${data.gold || "0"}`);
       sections.push(`Doubloons: ${data.doubloons || "0"}`);
       sections.push("");
       
-      if (data.enableCrew) {
+      if (data.enableCrew && data.crew) {
         sections.push("Crew:");
-        sections.push(data.crew || "N/A");
+        sections.push(data.crew);
+        sections.push("");
       }
       
       return sections.join("\n");
@@ -53,13 +59,24 @@ export class StandardDiscordFormat implements DiscordFormatStrategy {
       };
 
       const sections = [
+        data.title || "Skirmish Log",
+        "",
+        data.body || "Skirmish details here",
+        "",
         `Team: ${data.ourTeam || "Athena"}`,
         "",
         "Dives:",
         data.dives.length
           ? data.dives.map((d, i) => formatDive(d, i)).join("\n")
           : "No dives yet",
+        ""
       ];
+
+      if (data.enableCrew && data.crew) {
+        sections.push("Crew:");
+        sections.push(data.crew);
+        sections.push("");
+      }
       return sections.join("\n");
     };
 

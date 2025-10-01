@@ -47,9 +47,9 @@ export class TrigsDiscordFormat implements DiscordFormatStrategy {
       sections.push("");
     }
     
-    if (data.signature) {
+    if (data.notes) {
       sections.push("**CO Notes:**");
-      sections.push(data.signature);
+      sections.push(data.notes);
     }
     
     return sections.join("\n");
@@ -100,6 +100,16 @@ export class TrigsDiscordFormat implements DiscordFormatStrategy {
 
       sections.push(`🏆 Win/Loss: ${wins}/${losses} (${winRate}%)`);
       sections.push(`🔥 Highest Streak: ${streaks.highestStreak}`);
+    }
+    
+    // Add crew support for skirmish logs
+    if (data.enableCrew && data.crew) {
+      sections.push("");
+      sections.push("**Crew:**");
+      const crewList = data.crew.split("\n").filter(c => c.trim());
+      crewList.forEach(member => {
+        sections.push(`${member}`);
+      });
     }
     
     if (data.signature) {

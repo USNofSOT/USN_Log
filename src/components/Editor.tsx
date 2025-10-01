@@ -329,11 +329,24 @@ function ordinal_suffix_of(i: number) {
                 + Add Dive
               </button>
             </div>
+
+            {/* Add crew section for skirmish mode */}
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Crew Members (One per line)
+              </label>
+              <textarea
+                value={crew}
+                onChange={(e) => setCrew(e.target.value)}
+                className="w-full p-2 bg-[#3a3a3a] rounded border border-gray-600 text-white h-32"
+                placeholder="Enter crew members..."
+              />
+            </div>
           </>
         )}
 
         <div>
-          <label className="block text-sm font-medium mb-2">Signature</label>
+          <label className="block text-sm font-medium mb-2">Notes</label>
           <textarea
             value={signature}
             onChange={(e) => setSignature(e.target.value)}
