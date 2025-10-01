@@ -1,11 +1,13 @@
 import { DiscordFormatStrategy } from './DiscordFormatStrategy';
 import { StandardDiscordFormat } from './StandardDiscordFormat';
 import { TrigsDiscordFormat } from './TrigsDiscordFormat';
+import { SaberDiscordFormat } from './SaberDiscordFormat';
 
 export class DiscordFormatFactory {
   private static strategies: Map<string, DiscordFormatStrategy> = new Map([
     ['Standard', new StandardDiscordFormat()],
     ['Trigs', new TrigsDiscordFormat()],
+    ['Saber', new SaberDiscordFormat()],
   ]);
 
   public static getStrategy(format: string): DiscordFormatStrategy {

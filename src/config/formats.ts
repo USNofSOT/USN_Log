@@ -7,6 +7,10 @@ export const discordFormats = {
         name: "Trig's Format",
         description: "A unique format created by Trig"
     },
+    Saber: {
+        name: "Saber Format",
+        description: "A unique format created by Saber"
+    }
 };
 
 export const imageFormats = {
