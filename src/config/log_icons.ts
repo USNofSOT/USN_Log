@@ -34,5 +34,11 @@ export const log_icons = [
     value: "berserker",
     path: "/USN_Log/log_icons/ships/main_ships/berserker.png",
     alt: "Berserker Ship"
+  },
+  {
+    name: "Snake",
+    value: "snake",
+    path: "/USN_Log/log_icons/clean_snake.png",
+    alt: "Snake Ship"
   }
 ]
