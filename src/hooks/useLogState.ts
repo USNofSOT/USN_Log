@@ -17,6 +17,111 @@ type DiveEntry = {
 export type LogMode = "patrol" | "skirmish";
 export type ShipType = string;
 
+// Section styling types
+export type TextAlignment = "left" | "center" | "right" | "justify";
+export type SectionStyle = {
+  alignment: TextAlignment;
+  paddingTop: number;
+  paddingBottom: number;
+  paddingLeft: number;
+  paddingRight: number;
+  marginTop: number;
+  marginBottom: number;
+  marginLeft: number;
+  marginRight: number;
+};
+
+export type SectionStyles = {
+  title: SectionStyle;
+  body: SectionStyle;
+  events: SectionStyle;
+  crew: SectionStyle;
+  signature: SectionStyle;
+  gold: SectionStyle;
+  dives: SectionStyle;
+};
+
+// Default section styles
+const defaultSectionStyles: SectionStyles = {
+  title: {
+    alignment: "center",
+    paddingTop: 20,
+    paddingBottom: 20,
+    paddingLeft: 64,
+    paddingRight: 64,
+    marginTop: 48,
+    marginBottom: 32,
+    marginLeft: 0,
+    marginRight: 0,
+  },
+  body: {
+    alignment: "left",
+    paddingTop: 8,
+    paddingBottom: 8,
+    paddingLeft: 8,
+    paddingRight: 8,
+    marginTop: 0,
+    marginBottom: 0,
+    marginLeft: 0,
+    marginRight: 0,
+  },
+  events: {
+    alignment: "left",
+    paddingTop: 8,
+    paddingBottom: 8,
+    paddingLeft: 24,
+    paddingRight: 8,
+    marginTop: 16,
+    marginBottom: 0,
+    marginLeft: 0,
+    marginRight: 0,
+  },
+  crew: {
+    alignment: "left",
+    paddingTop: 8,
+    paddingBottom: 8,
+    paddingLeft: 8,
+    paddingRight: 8,
+    marginTop: 16,
+    marginBottom: 0,
+    marginLeft: 0,
+    marginRight: 0,
+  },
+  signature: {
+    alignment: "right",
+    paddingTop: 0,
+    paddingBottom: 0,
+    paddingLeft: 0,
+    paddingRight: 64,
+    marginTop: 0,
+    marginBottom: 0,
+    marginLeft: 0,
+    marginRight: 0,
+  },
+  gold: {
+    alignment: "left",
+    paddingTop: 0,
+    paddingBottom: 0,
+    paddingLeft: 16,
+    paddingRight: 0,
+    marginTop: 0,
+    marginBottom: 0,
+    marginLeft: 0,
+    marginRight: 0,
+  },
+  dives: {
+    alignment: "left",
+    paddingTop: 8,
+    paddingBottom: 8,
+    paddingLeft: 8,
+    paddingRight: 8,
+    marginTop: 0,
+    marginBottom: 0,
+    marginLeft: 0,
+    marginRight: 0,
+  },
+};
+
 export function useLogState() {
   // Mode and basic fields
   const [mode, setMode] = useState<LogMode>("patrol");
@@ -96,6 +201,9 @@ export function useLogState() {
   // Preview mode
   const [previewMode, setPreviewMode] = useState<"image" | "discord">("image");
 
+  // Section-specific styling
+  const [sectionStyles, setSectionStyles] = useState<SectionStyles>(defaultSectionStyles);
+
   // -----------------------------------
   // Load from localStorage on mount
   // -----------------------------------
@@ -151,6 +259,8 @@ export function useLogState() {
     const savedListColor = localStorage.getItem("listColor");
     const savedGoldColor = localStorage.getItem("goldColor");
 
+    const savedSectionStyles = localStorage.getItem("sectionStyles");
+
     if (savedTitle) setTitle(savedTitle);
     if (savedBody) setBody(savedBody);
     if (savedSignature) setSignature(savedSignature);
@@ -193,6 +303,7 @@ export function useLogState() {
     if (savedHeaderColor) setHeaderColor(savedHeaderColor);
     if (savedListColor) setListColor(savedListColor);
     if (savedGoldColor) setGoldColor(savedGoldColor);
+    if (savedSectionStyles) setSectionStyles(JSON.parse(savedSectionStyles));
   }, []);
 
   // Helper: Debounce calls to localStorage
@@ -253,6 +364,7 @@ export function useLogState() {
       localStorage.setItem("headerColor", headerColor);
       localStorage.setItem("listColor", listColor);
       localStorage.setItem("goldColor", goldColor);
+      localStorage.setItem("sectionStyles", JSON.stringify(sectionStyles));
     };
     const debouncedSave = debounce(saveToLocalStorage, 500);
     debouncedSave();
@@ -300,6 +412,7 @@ export function useLogState() {
     headerColor,
     listColor,
     goldColor,
+    sectionStyles,
   ]);
 
   // Pagination logic
@@ -454,6 +567,19 @@ export function useLogState() {
     return strategy.formatMessage(formatData);
   };
 
+  // Helper to update section styles
+  const updateSectionStyle = (section: keyof SectionStyles, updates: Partial<SectionStyle>) => {
+    setSectionStyles(prev => ({
+      ...prev,
+      [section]: { ...prev[section], ...updates }
+    }));
+  };
+
+  // Reset section styles to defaults
+  const resetSectionStyles = () => {
+    setSectionStyles(defaultSectionStyles);
+  };
+
   return {
     // State
     mode,
@@ -504,6 +630,12 @@ export function useLogState() {
     discordFormat,
     imageFormat,
     previewMode,
+
+    // Section styling
+    sectionStyles,
+    setSectionStyles,
+    updateSectionStyle,
+    resetSectionStyles,
 
     // Setters
     setMode,

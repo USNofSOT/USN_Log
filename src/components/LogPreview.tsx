@@ -2,6 +2,7 @@ import React from "react";
 import { useLog } from "../context/LogContext";
 import { log_icons } from "../config/log_icons";
 import { log_backgrounds } from "../config/log_background";
+import type { SectionStyle } from "../hooks/useLogState";
 
 export const LogPreview: React.FC = () => {
   const {
@@ -33,7 +34,6 @@ export const LogPreview: React.FC = () => {
     titleFontSize,
     bodyFontSize,
     contentPadding,
-    contentMargin,
     enableEvents,
     enableCrew,
     previewMode,
@@ -44,11 +44,26 @@ export const LogPreview: React.FC = () => {
     headerColor,
     listColor,
     goldColor,
+    sectionStyles,
   } = useLog();
+
   const shipLogos: Record<string, string> = log_icons.reduce((acc, icon) => {
     acc[icon.value] = icon.path;
     return acc;
   }, {} as Record<string, string>);
+
+  // Helper to create section style object
+  const getSectionStyle = (sectionStyle: SectionStyle): React.CSSProperties => ({
+    textAlign: sectionStyle.alignment as any,
+    paddingTop: `${sectionStyle.paddingTop}px`,
+    paddingBottom: `${sectionStyle.paddingBottom}px`,
+    paddingLeft: `${sectionStyle.paddingLeft}px`,
+    paddingRight: `${sectionStyle.paddingRight}px`,
+    marginTop: `${sectionStyle.marginTop}px`,
+    marginBottom: `${sectionStyle.marginBottom}px`,
+    marginLeft: `${sectionStyle.marginLeft}px`,
+    marginRight: `${sectionStyle.marginRight}px`,
+  });
 
   const renderPage = (pageText: string, idx: number, isVisible: boolean) => {
     const displayStyle = isVisible ? "block" : "none";
@@ -92,46 +107,42 @@ export const LogPreview: React.FC = () => {
         <div
           id="writing-area"
           className="h-full flex flex-col relative z-10"
-          style={{ 
-            marginLeft: `${contentMargin}px`,
-            marginRight: `${contentMargin}px`,
-            marginTop: `${contentMargin}px`,
-            marginBottom: `${contentMargin}px`
-           }}
         >
-          {/* Conditional title rendering with dynamic spacing */}
+          {/* Title Section */}
           {(showTitleOnFirstPage ? isFirstPage : true) && (
-            <h2
-              className={`text-center font-${titleFont} whitespace-pre-wrap`}
-              style={{ 
-                fontSize: `${titleFontSize}px`,
-                color: titleColor,
-              }}
-            >
-              {title || "Log Title"}
-            </h2>
+            <div style={getSectionStyle(sectionStyles.title)}>
+              <h2
+                className={`font-${titleFont} whitespace-pre-wrap`}
+                style={{ 
+                  fontSize: `${titleFontSize}px`,
+                  color: titleColor,
+                }}
+              >
+                {title || "Log Title"}
+              </h2>
+            </div>
           )}
 
-          {/* Body text with dynamic spacing */}
+          {/* Body Section */}
           <div
             className={`font-${bodyFont} flex-grow whitespace-pre-wrap leading-relaxed`}
             style={{ 
               fontSize: `${bodyFontSize}px`,
               color: bodyColor,
-              padding: '1rem'
+              ...getSectionStyle(sectionStyles.body),
             }}
           >
             {pageText || "Your log entry will appear here..."}
           </div>
 
+          {/* Patrol Mode Sections */}
           {isLastPage && mode === "patrol" && (
             <>
               {(showExtrasOnLastPage ? isLastPage : true) && (
-                <div 
-                  className="grid grid-cols-2 gap-8"
-                >
+                <div className="grid grid-cols-2 gap-8">
+                  {/* Events Section */}
                   {enableEvents && events && (
-                    <div>
+                    <div style={getSectionStyle(sectionStyles.events)}>
                       <h3 
                         className={`font-${headerFont}`}
                         style={{ 
@@ -165,8 +176,9 @@ export const LogPreview: React.FC = () => {
                     </div>
                   )}
 
+                  {/* Crew Section */}
                   {enableCrew && crew && (
-                    <div>
+                    <div style={getSectionStyle(sectionStyles.crew)}>
                       <h3 
                         className={`font-${headerFont}`}
                         style={{ 
@@ -202,12 +214,13 @@ export const LogPreview: React.FC = () => {
                 </div>
               )}
 
-              {/* Gold + Doubloons + Signature */}
+              {/* Gold + Doubloons Section */}
               <div className="flex justify-between items-end">
                 <div 
                   className="flex gap-8"
+                  style={getSectionStyle(sectionStyles.gold)}
                 >
-                  <div className="flex pl-4 items-center gap-2">
+                  <div className="flex items-center gap-2">
                     <img
                       src="/USN_Log/gold.webp"
                       alt="Gold"
@@ -243,6 +256,7 @@ export const LogPreview: React.FC = () => {
                   </div>
                 </div>
 
+                {/* Signature Section */}
                 {(showExtrasOnLastPage ? isLastPage : true) && (
                   <div
                     className={`font-${signatureFont} absolute right-16 bottom-0 font-bold whitespace-pre-wrap`}
@@ -251,6 +265,7 @@ export const LogPreview: React.FC = () => {
                       color: signatureColor,
                       transform: "rotate(-4deg)",
                       textShadow: "1px 1px 2px rgba(0,0,0,0.1)",
+                      ...getSectionStyle(sectionStyles.signature),
                     }}
                   >
                     {signature || "Your Signature"}
@@ -260,13 +275,14 @@ export const LogPreview: React.FC = () => {
             </>
           )}
 
-          {/* Handle non-last pages with signature without subtitle */}
+          {/* Non-last pages with patrol sections */}
           {!isLastPage && (
             <>
               {!showExtrasOnLastPage && mode === "patrol" && (
                 <>
+                  {/* Events Section */}
                   {events && (
-                    <div>
+                    <div style={getSectionStyle(sectionStyles.events)}>
                       <h3 
                         className={`font-${headerFont}`}
                         style={{ 
@@ -284,18 +300,15 @@ export const LogPreview: React.FC = () => {
                         }}
                       >
                         {formatList(events).map((ev, i) => (
-                          <li 
-                            key={i}
-                          >
-                            {ev}
-                          </li>
+                          <li key={i}>{ev}</li>
                         ))}
                       </ul>
                     </div>
                   )}
 
+                  {/* Crew Section */}
                   {crew && (
-                    <div className="mt-4">
+                    <div style={getSectionStyle(sectionStyles.crew)}>
                       <h3 
                         className={`font-${headerFont} mb-2`}
                         style={{ 
@@ -319,6 +332,7 @@ export const LogPreview: React.FC = () => {
                     </div>
                   )}
 
+                  {/* Signature Section */}
                   <div className="flex justify-end mt-auto">
                     <div
                       className={`font-${signatureFont} font-bold whitespace-pre-wrap`}
@@ -327,6 +341,7 @@ export const LogPreview: React.FC = () => {
                         color: signatureColor,
                         transform: "rotate(-4deg)",
                         textShadow: "1px 1px 2px rgba(0,0,0,0.1)",
+                        ...getSectionStyle(sectionStyles.signature),
                       }}
                     >
                       {signature || "Your Signature"}
@@ -337,9 +352,9 @@ export const LogPreview: React.FC = () => {
             </>
           )}
 
-          {/* Skirmish mode signature without subtitle */}
+          {/* Skirmish Mode Sections */}
           {isLastPage && mode === "skirmish" && (
-            <div>
+            <div style={getSectionStyle(sectionStyles.dives)}>
               <h3 
                 className={`font-${headerFont}`}
                 style={{ 
@@ -391,6 +406,7 @@ export const LogPreview: React.FC = () => {
                 </div>
               </div>
 
+              {/* Signature Section */}
               <div 
                 className="flex justify-end items-center"
               >
@@ -401,6 +417,7 @@ export const LogPreview: React.FC = () => {
                     color: signatureColor,
                     transform: "rotate(-4deg)",
                     textShadow: "1px 1px 2px rgba(0,0,0,0.1)",
+                    ...getSectionStyle(sectionStyles.signature),
                   }}
                 >
                   {signature || "Your Signature"}
