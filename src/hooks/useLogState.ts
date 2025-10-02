@@ -44,11 +44,20 @@ export function useLogState() {
   const [isCopyModalOpen, setIsCopyModalOpen] = useState(false);
 
   // Font choices
-  const [titleFont, setTitleFont] = useState(defaultFonts.title);
-  const [bodyFont, setBodyFont] = useState(defaultFonts.body);
-  const [signatureFont, setSignatureFont] = useState(defaultFonts.signature);
-  const [headerFont, setHeaderFont] = useState(defaultFonts.headers);
-  const [listFont, setListFont] = useState(defaultFonts.lists);
+  const [titleFont, setTitleFont] = useState("Satisfy");
+  const [bodyFont, setBodyFont] = useState("Indie_Flower");
+  const [signatureFont, setSignatureFont] = useState("Dancing_Script");
+  const [headerFont, setHeaderFont] = useState("Satisfy");
+  const [listFont, setListFont] = useState("Indie_Flower");
+  const [goldFont, setGoldFont] = useState("Indie_Flower");
+
+  // Font colors
+  const [titleColor, setTitleColor] = useState("#000000");
+  const [bodyColor, setBodyColor] = useState("#000000");
+  const [signatureColor, setSignatureColor] = useState("#000000");
+  const [headerColor, setHeaderColor] = useState("#000000");
+  const [listColor, setListColor] = useState("#000000");
+  const [goldColor, setGoldColor] = useState("#000000");
 
   // Font sizes
   const [titleFontSize, setTitleFontSize] = useState(defaultFontSizes.title);
@@ -106,12 +115,16 @@ export function useLogState() {
     const savedLogIcon = localStorage.getItem("logIcon");
     const savedTitleFont = localStorage.getItem("titleFont");
     const savedBodyFont = localStorage.getItem("bodyFont");
+    const savedTitleColor = localStorage.getItem("titleColor");
+    const savedBodyColor = localStorage.getItem("bodyColor");
+    const savedSignatureColor = localStorage.getItem("signatureColor");
     const savedMainShip = localStorage.getItem("mainShip");
     const savedAuxiliaryShip = localStorage.getItem("auxiliaryShip");
     const savedVoyageNumber = localStorage.getItem("voyageNumber");
     const savedSignatureFont = localStorage.getItem("signatureFont");
     const savedHeaderFont = localStorage.getItem("headerFont");
     const savedListFont = localStorage.getItem("listFont");
+    const savedGoldFont = localStorage.getItem("goldFont");
     const savedShowEventsOnLastPage = localStorage.getItem("showEventsOnLastPage");
     const savedShowCrewOnLastPage = localStorage.getItem("showCrewOnLastPage");
     const savedShowSignatureOnLastPage = localStorage.getItem("showSignatureOnLastPage");
@@ -134,6 +147,10 @@ export function useLogState() {
     const savedImageFormat = localStorage.getItem("imageFormat");
     const savedLogBackground = localStorage.getItem("logBackground");
 
+    const savedHeaderColor = localStorage.getItem("headerColor");
+    const savedListColor = localStorage.getItem("listColor");
+    const savedGoldColor = localStorage.getItem("goldColor");
+
     if (savedTitle) setTitle(savedTitle);
     if (savedBody) setBody(savedBody);
     if (savedSignature) setSignature(savedSignature);
@@ -146,12 +163,16 @@ export function useLogState() {
     if (savedLogIcon) setLogIcon(savedLogIcon as ShipType);
     if (savedTitleFont) setTitleFont(savedTitleFont);
     if (savedBodyFont) setBodyFont(savedBodyFont);
+    if (savedTitleColor) setTitleColor(savedTitleColor);
+    if (savedBodyColor) setBodyColor(savedBodyColor);
+    if (savedSignatureColor) setSignatureColor(savedSignatureColor);
     if (savedMainShip) setMainShip(savedMainShip);
     if (savedAuxiliaryShip) setAuxiliaryShip(savedAuxiliaryShip);
     if (savedVoyageNumber) setVoyageNumber(savedVoyageNumber);
     if (savedSignatureFont) setSignatureFont(savedSignatureFont);
     if (savedHeaderFont) setHeaderFont(savedHeaderFont);
     if (savedListFont) setListFont(savedListFont);
+    if (savedGoldFont) setGoldFont(savedGoldFont);
     if (savedShowEventsOnLastPage !== null) setShowEventsOnLastPage(savedShowEventsOnLastPage === "true");
     if (savedShowCrewOnLastPage !== null) setShowCrewOnLastPage(savedShowCrewOnLastPage === "true");
     if (savedShowSignatureOnLastPage !== null) setShowSignatureOnLastPage(savedShowSignatureOnLastPage === "true");
@@ -169,6 +190,9 @@ export function useLogState() {
     if (savedDiscordFormat) setDiscordFormat(savedDiscordFormat);
     if (savedImageFormat) setImageFormat(savedImageFormat);
     if (savedLogBackground) setLogBackground(savedLogBackground);
+    if (savedHeaderColor) setHeaderColor(savedHeaderColor);
+    if (savedListColor) setListColor(savedListColor);
+    if (savedGoldColor) setGoldColor(savedGoldColor);
   }, []);
 
   // Helper: Debounce calls to localStorage
@@ -200,12 +224,16 @@ export function useLogState() {
       localStorage.setItem("logBackground", logBackground);
       localStorage.setItem("titleFont", titleFont);
       localStorage.setItem("bodyFont", bodyFont);
+      localStorage.setItem("titleColor", titleColor);
+      localStorage.setItem("bodyColor", bodyColor);
+      localStorage.setItem("signatureColor", signatureColor);
       localStorage.setItem("mainShip", mainShip);
       localStorage.setItem("auxiliaryShip", auxiliaryShip);
       localStorage.setItem("voyageNumber", voyageNumber);
       localStorage.setItem("signatureFont", signatureFont);
       localStorage.setItem("headerFont", headerFont);
       localStorage.setItem("listFont", listFont);
+      localStorage.setItem("goldFont", goldFont);
       localStorage.setItem("showEventsOnLastPage", showEventsOnLastPage.toString());
       localStorage.setItem("showCrewOnLastPage", showCrewOnLastPage.toString());
       localStorage.setItem("showSignatureOnLastPage", showSignatureOnLastPage.toString());
@@ -222,6 +250,9 @@ export function useLogState() {
       localStorage.setItem("enableCrew", enableCrew.toString());
       localStorage.setItem("discordFormat", discordFormat);
       localStorage.setItem("imageFormat", imageFormat);
+      localStorage.setItem("headerColor", headerColor);
+      localStorage.setItem("listColor", listColor);
+      localStorage.setItem("goldColor", goldColor);
     };
     const debouncedSave = debounce(saveToLocalStorage, 500);
     debouncedSave();
@@ -238,6 +269,9 @@ export function useLogState() {
     dives,
     titleFont,
     bodyFont,
+    titleColor,
+    bodyColor,
+    signatureColor,
     logIcon,
     logBackground,
     mainShip,
@@ -246,6 +280,7 @@ export function useLogState() {
     signatureFont,
     headerFont,
     listFont,
+    goldFont,
     showEventsOnLastPage,
     showCrewOnLastPage,
     showSignatureOnLastPage,
@@ -262,6 +297,9 @@ export function useLogState() {
     enableCrew,
     discordFormat,
     imageFormat,
+    headerColor,
+    listColor,
+    goldColor,
   ]);
 
   // Pagination logic
@@ -438,6 +476,13 @@ export function useLogState() {
     signatureFont,
     headerFont,
     listFont,
+    goldFont,
+    titleColor,
+    bodyColor,
+    signatureColor,
+    headerColor,
+    listColor,
+    goldColor,
     logIcon,
     logBackground,
     activePageIndex,
@@ -481,6 +526,13 @@ export function useLogState() {
     setSignatureFont,
     setHeaderFont,
     setListFont,
+    setGoldFont,
+    setTitleColor,
+    setBodyColor,
+    setSignatureColor,
+    setHeaderColor,
+    setListColor,
+    setGoldColor,
     setLogIcon,
     setLogBackground,
     setActivePageIndex,

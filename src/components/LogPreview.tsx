@@ -13,6 +13,7 @@ export const LogPreview: React.FC = () => {
     signature,
     headerFont,
     listFont,
+    goldFont,
     signatureFontSize,
     headerFontSize,
     listFontSize,
@@ -37,6 +38,12 @@ export const LogPreview: React.FC = () => {
     enableCrew,
     previewMode,
     formatDiscordMessage,
+    titleColor,
+    bodyColor,
+    signatureColor,
+    headerColor,
+    listColor,
+    goldColor,
   } = useLog();
   const shipLogos: Record<string, string> = log_icons.reduce((acc, icon) => {
     acc[icon.value] = icon.path;
@@ -95,9 +102,10 @@ export const LogPreview: React.FC = () => {
           {/* Conditional title rendering with dynamic spacing */}
           {(showTitleOnFirstPage ? isFirstPage : true) && (
             <h2
-              className={`text-center font-${titleFont} text-black whitespace-pre-wrap`}
+              className={`text-center font-${titleFont} whitespace-pre-wrap`}
               style={{ 
                 fontSize: `${titleFontSize}px`,
+                color: titleColor,
               }}
             >
               {title || "Log Title"}
@@ -106,9 +114,10 @@ export const LogPreview: React.FC = () => {
 
           {/* Body text with dynamic spacing */}
           <div
-            className={`font-${bodyFont} flex-grow whitespace-pre-wrap text-black leading-relaxed`}
+            className={`font-${bodyFont} flex-grow whitespace-pre-wrap leading-relaxed`}
             style={{ 
               fontSize: `${bodyFontSize}px`,
+              color: bodyColor,
               padding: '1rem'
             }}
           >
@@ -124,17 +133,19 @@ export const LogPreview: React.FC = () => {
                   {enableEvents && events && (
                     <div>
                       <h3 
-                        className={`font-${headerFont} text-black`}
+                        className={`font-${headerFont}`}
                         style={{ 
                           fontSize: `${headerFontSize}px`,
+                          color: headerColor,
                         }}
                       >
                         Notable Events
                       </h3>
                       <ul
-                        className={`list-none font-${listFont} text-black`}
+                        className={`list-none font-${listFont}`}
                         style={{
                           fontSize: `${listFontSize}px`,
+                          color: listColor,
                           columns: "2",
                           columnGap: "1rem",
                           breakInside: "avoid-column",
@@ -157,17 +168,19 @@ export const LogPreview: React.FC = () => {
                   {enableCrew && crew && (
                     <div>
                       <h3 
-                        className={`font-${headerFont} text-black`}
+                        className={`font-${headerFont}`}
                         style={{ 
                           fontSize: `${headerFontSize}px`,
+                          color: headerColor,
                         }}
                       >
                         Crew Manifest
                       </h3>
                       <ul
-                        className={`list-none font-${listFont} text-black`}
+                        className={`list-none font-${listFont}`}
                         style={{
                           fontSize: `${listFontSize}px`,
+                          color: listColor,
                           columns: "2",
                           columnGap: "1rem",
                           breakInside: "avoid-column",
@@ -202,8 +215,11 @@ export const LogPreview: React.FC = () => {
                       className="w-8 h-8"
                     />
                     <span 
-                      className={`font-${listFont} text-black`}
-                      style={{ fontSize: `${listFontSize * 1.3}px` }}
+                      className={`font-${goldFont}`}
+                      style={{ 
+                        fontSize: `${listFontSize * 1.3}px`,
+                        color: goldColor,
+                      }}
                     >
                       {gold || "0"}
                     </span>
@@ -216,8 +232,11 @@ export const LogPreview: React.FC = () => {
                       className="w-8 h-8"
                     />
                     <span 
-                      className={`font-${listFont} text-black`}
-                      style={{ fontSize: `${listFontSize * 1.3}px` }}
+                      className={`font-${goldFont}`}
+                      style={{ 
+                        fontSize: `${listFontSize * 1.3}px`,
+                        color: goldColor,
+                      }}
                     >
                       {doubloons || "0"}
                     </span>
@@ -226,9 +245,10 @@ export const LogPreview: React.FC = () => {
 
                 {(showExtrasOnLastPage ? isLastPage : true) && (
                   <div
-                    className={`font-${signatureFont} absolute right-16 bottom-0 text-black font-bold whitespace-pre-wrap`}
+                    className={`font-${signatureFont} absolute right-16 bottom-0 font-bold whitespace-pre-wrap`}
                     style={{
                       fontSize: `${signatureFontSize}px`,
+                      color: signatureColor,
                       transform: "rotate(-4deg)",
                       textShadow: "1px 1px 2px rgba(0,0,0,0.1)",
                     }}
@@ -248,16 +268,20 @@ export const LogPreview: React.FC = () => {
                   {events && (
                     <div>
                       <h3 
-                        className={`font-${headerFont} text-black`}
+                        className={`font-${headerFont}`}
                         style={{ 
                           fontSize: `${headerFontSize}px`,
+                          color: headerColor,
                         }}
                       >
                         Notable Events
                       </h3>
                       <ul 
-                        className={`list-none font-${listFont} text-black`}
-                        style={{ fontSize: `${listFontSize}px` }}
+                        className={`list-none font-${listFont}`}
+                        style={{ 
+                          fontSize: `${listFontSize}px`,
+                          color: listColor,
+                        }}
                       >
                         {formatList(events).map((ev, i) => (
                           <li 
@@ -273,14 +297,20 @@ export const LogPreview: React.FC = () => {
                   {crew && (
                     <div className="mt-4">
                       <h3 
-                        className={`font-${headerFont} text-black mb-2`}
-                        style={{ fontSize: `${headerFontSize}px` }}
+                        className={`font-${headerFont} mb-2`}
+                        style={{ 
+                          fontSize: `${headerFontSize}px`,
+                          color: headerColor,
+                        }}
                       >
                         Crew Manifest
                       </h3>
                       <ul 
-                        className={`list-none font-${listFont} text-black`}
-                        style={{ fontSize: `${listFontSize}px` }}
+                        className={`list-none font-${listFont}`}
+                        style={{ 
+                          fontSize: `${listFontSize}px`,
+                          color: listColor,
+                        }}
                       >
                         {formatList(crew).map((member, i) => (
                           <li key={i}>{member}</li>
@@ -291,9 +321,10 @@ export const LogPreview: React.FC = () => {
 
                   <div className="flex justify-end mt-auto">
                     <div
-                      className={`font-${signatureFont} text-black font-bold whitespace-pre-wrap`}
+                      className={`font-${signatureFont} font-bold whitespace-pre-wrap`}
                       style={{
                         fontSize: `${signatureFontSize}px`,
+                        color: signatureColor,
                         transform: "rotate(-4deg)",
                         textShadow: "1px 1px 2px rgba(0,0,0,0.1)",
                       }}
@@ -310,17 +341,19 @@ export const LogPreview: React.FC = () => {
           {isLastPage && mode === "skirmish" && (
             <div>
               <h3 
-                className={`font-${headerFont} text-black`}
+                className={`font-${headerFont}`}
                 style={{ 
                   fontSize: `${headerFontSize}px`,
+                  color: headerColor,
                 }}
               >
                 Skirmish Dives
               </h3>
               <div 
-                className={`font-${listFont} text-black leading-relaxed`}
+                className={`font-${listFont} leading-relaxed`}
                 style={{ 
                   fontSize: `${listFontSize}px`,
+                  color: listColor,
                 }}
               >
                 {dives.length === 0 && (
@@ -362,9 +395,10 @@ export const LogPreview: React.FC = () => {
                 className="flex justify-end items-center"
               >
                 <div
-                  className={`font-${signatureFont} text-black font-bold whitespace-pre-wrap`}
+                  className={`font-${signatureFont} font-bold whitespace-pre-wrap`}
                   style={{
                     fontSize: `${signatureFontSize}px`,
+                    color: signatureColor,
                     transform: "rotate(-4deg)",
                     textShadow: "1px 1px 2px rgba(0,0,0,0.1)",
                   }}

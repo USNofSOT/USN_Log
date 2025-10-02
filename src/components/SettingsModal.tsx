@@ -18,6 +18,7 @@ export const SettingsModal: React.FC = () => {
     signatureFont,
     headerFont,
     listFont,
+    goldFont,
     logBackground,
     setLogBackground,
     setTitleFont,
@@ -25,6 +26,7 @@ export const SettingsModal: React.FC = () => {
     setSignatureFont,
     setHeaderFont,
     setListFont,
+    setGoldFont,
     loadTestingData,
     logIcon,
     setLogIcon,
@@ -54,6 +56,18 @@ export const SettingsModal: React.FC = () => {
     imageFormat,
     setDiscordFormat,
     setImageFormat,
+    titleColor,
+    bodyColor,
+    signatureColor,
+    setTitleColor,
+    setBodyColor,
+    setSignatureColor,
+    headerColor,
+    listColor,
+    goldColor,
+    setHeaderColor,
+    setListColor,
+    setGoldColor,
   } = useLog();
 
   const onClose = () => setIsModalOpen(false);
@@ -235,6 +249,16 @@ export const SettingsModal: React.FC = () => {
                   />
                   <span className="text-xs text-gray-400 w-12">{titleFontSize}px</span>
                 </div>
+                <div className="flex items-center gap-2">
+                  <label className="text-xs text-gray-400 w-12">Color:</label>
+                  <input
+                    type="color"
+                    value={titleColor}
+                    onChange={(e) => setTitleColor(e.target.value)}
+                    className="w-8 h-8 rounded border border-gray-600 bg-gray-700"
+                  />
+                  <span className="text-xs text-gray-400">{titleColor}</span>
+                </div>
               </div>
 
               {/* Body Font */}
@@ -260,6 +284,16 @@ export const SettingsModal: React.FC = () => {
                     className="flex-1"
                   />
                   <span className="text-xs text-gray-400 w-12">{bodyFontSize}px</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <label className="text-xs text-gray-400 w-12">Color:</label>
+                  <input
+                    type="color"
+                    value={bodyColor}
+                    onChange={(e) => setBodyColor(e.target.value)}
+                    className="w-8 h-8 rounded border border-gray-600 bg-gray-700"
+                  />
+                  <span className="text-xs text-gray-400">{bodyColor}</span>
                 </div>
               </div>
 
@@ -287,6 +321,16 @@ export const SettingsModal: React.FC = () => {
                   />
                   <span className="text-xs text-gray-400 w-12">{signatureFontSize}px</span>
                 </div>
+                <div className="flex items-center gap-2">
+                  <label className="text-xs text-gray-400 w-12">Color:</label>
+                  <input
+                    type="color"
+                    value={signatureColor}
+                    onChange={(e) => setSignatureColor(e.target.value)}
+                    className="w-8 h-8 rounded border border-gray-600 bg-gray-700"
+                  />
+                  <span className="text-xs text-gray-400">{signatureColor}</span>
+                </div>
               </div>
 
               {/* Headers Font */}
@@ -312,6 +356,16 @@ export const SettingsModal: React.FC = () => {
                     className="flex-1"
                   />
                   <span className="text-xs text-gray-400 w-12">{headerFontSize}px</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <label className="text-xs text-gray-400 w-12">Color:</label>
+                  <input
+                    type="color"
+                    value={headerColor}
+                    onChange={(e) => setHeaderColor(e.target.value)}
+                    className="w-8 h-8 rounded border border-gray-600 bg-gray-700"
+                  />
+                  <span className="text-xs text-gray-400">{headerColor}</span>
                 </div>
               </div>
 
@@ -339,6 +393,41 @@ export const SettingsModal: React.FC = () => {
                   />
                   <span className="text-xs text-gray-400 w-12">{listFontSize}px</span>
                 </div>
+                <div className="flex items-center gap-2">
+                  <label className="text-xs text-gray-400 w-12">Color:</label>
+                  <input
+                    type="color"
+                    value={listColor}
+                    onChange={(e) => setListColor(e.target.value)}
+                    className="w-8 h-8 rounded border border-gray-600 bg-gray-700"
+                  />
+                  <span className="text-xs text-gray-400">{listColor}</span>
+                </div>
+              </div>
+
+              {/* Gold/Currency Settings */}
+              <div className="space-y-3">
+                <label className="block text-sm font-medium">Gold & Currency</label>
+                <select
+                  value={goldFont}
+                  onChange={(e) => setGoldFont(e.target.value)}
+                  className="w-full p-2 bg-gray-700 rounded border border-gray-600 text-white focus:border-blue-500"
+                >
+                  {availableFonts.map(font => (
+                    <option key={font.value} value={font.value}>{font.label}</option>
+                  ))}
+                </select>
+                <div className="flex items-center gap-2">
+                  <label className="text-xs text-gray-400 w-12">Color:</label>
+                  <input
+                    type="color"
+                    value={goldColor}
+                    onChange={(e) => setGoldColor(e.target.value)}
+                    className="w-8 h-8 rounded border border-gray-600 bg-gray-700"
+                  />
+                  <span className="text-xs text-gray-400">{goldColor}</span>
+                </div>
+                <p className="text-xs text-gray-500">Font and color for gold and doubloon values</p>
               </div>
             </div>
           </div>
@@ -460,6 +549,7 @@ export const SettingsModal: React.FC = () => {
                   setSignatureFont(defaultFonts.signature);
                   setHeaderFont(defaultFonts.headers);
                   setListFont(defaultFonts.lists);
+                  setGoldFont(defaultFonts.lists);
                   
                   // Reset font sizes
                   setTitleFontSize(defaultFontSizes.title);
@@ -467,6 +557,14 @@ export const SettingsModal: React.FC = () => {
                   setSignatureFontSize(defaultFontSizes.signature);
                   setHeaderFontSize(defaultFontSizes.headers);
                   setListFontSize(defaultFontSizes.lists);
+                  
+                  // Reset colors
+                  setTitleColor("#000000");
+                  setBodyColor("#000000");
+                  setSignatureColor("#000000");
+                  setHeaderColor("#000000");
+                  setListColor("#000000");
+                  setGoldColor("#000000");
                   
                   // Reset spacing
                   setContentPadding(defaultSpacing.padding);

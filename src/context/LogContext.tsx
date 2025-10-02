@@ -35,6 +35,7 @@ interface LogContextType {
   signatureFont: string;
   headerFont: string;
   listFont: string;
+  goldFont: string;
   showSignatureOnLastPage: boolean;
   showTitleOnFirstPage: boolean;
   showExtrasOnLastPage: boolean;
@@ -49,6 +50,12 @@ interface LogContextType {
   enableCrew: boolean;
   discordFormat: string;
   imageFormat: string;
+  titleColor: string;
+  bodyColor: string;
+  signatureColor: string;
+  headerColor: string;
+  listColor: string;
+  goldColor: string;
 
   // Setters
   setMode: (mode: "patrol" | "skirmish") => void;
@@ -73,6 +80,7 @@ interface LogContextType {
   setSignatureFont: (font: string) => void;
   setHeaderFont: (font: string) => void;
   setListFont: (font: string) => void;
+  setGoldFont: (font: string) => void;
   setShowSignatureOnLastPage: (show: boolean) => void;
   setShowTitleOnFirstPage: (show: boolean) => void;
   setShowExtrasOnLastPage: (show: boolean) => void;
@@ -87,6 +95,12 @@ interface LogContextType {
   setEnableCrew: (enabled: boolean) => void;
   setDiscordFormat: (format: string) => void;
   setImageFormat: (format: string) => void;
+  setTitleColor: (color: string) => void;
+  setBodyColor: (color: string) => void;
+  setSignatureColor: (color: string) => void;
+  setHeaderColor: (color: string) => void;
+  setListColor: (color: string) => void;
+  setGoldColor: (color: string) => void;
   setPreviewMode: (mode: "image" | "discord") => void;
 
   // Actions
